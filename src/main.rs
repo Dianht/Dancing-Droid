@@ -1,3 +1,6 @@
+//A FAIRE : crée des fonctions, faire marcher le programme à partir de fichier d'instrucions
+
+
 struct Robot<'a>  {
     id: String,
     orientation : String,
