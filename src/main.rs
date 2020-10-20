@@ -1,5 +1,11 @@
 //A FAIRE : crée des fonctions, faire marcher le programme à partir de fichier d'instrucions
 
+enum Orientation {
+    North,
+    South,
+    Est,
+    West,
+}
 
 struct Robot<'a>  {
     id: String,
