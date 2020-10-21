@@ -17,10 +17,14 @@ struct Robot {
     y: i32,
 }
 
-fn game(instruction_robot : &Instruction,robot : &mut Robot,mut direction : &Orientation){
+fn game(instruction_robot : Vec<&Instruction>,robot1 : &mut Robot,robot2 : &mut Robot,direction_rb1 : Orientation,direction_rb2 : Orientation){
     
-        match instruction_robot{
-            Instruction::F=>{
+    let robot = robot1;
+    let mut tmp : Orientation;
+    let mut direction = direction_rb1;
+    for i in 0..5 {
+        match instruction_robot[i]{
+            Instruction::F =>{
                 match direction {
                     Orientation::North => {
                         robot.y = robot.y + 1;
@@ -39,37 +43,42 @@ fn game(instruction_robot : &Instruction,robot : &mut Robot,mut direction : &Ori
             Instruction::L => {
                 match direction {
                     Orientation::North => {
-                        direction = &Orientation::West;
+                        direction = Orientation::West;
                     }
                     Orientation::West => {
-                        direction = &Orientation::South;
+                        direction = Orientation::South;
                     }
                     Orientation::Est => {
-                        direction = &Orientation::North;
+                        direction = Orientation::North;
                     }
                     Orientation::South => {
-                        direction = &Orientation::Est;
+                        direction = Orientation::Est;
                     }
                 }
             }
             Instruction::R => {
                 match direction {
                     Orientation::North => {
-                        direction = &Orientation::Est;
+                        direction = Orientation::Est;
                     }
                     Orientation::West => {
-                        direction = &Orientation::North;
+                        direction = Orientation::North;
                     }
                     Orientation::Est => {
-                        direction = &Orientation::South;
+                        direction = Orientation::South;
                     }
                     Orientation::South => {
-                        direction = &Orientation::West;
+                        direction = Orientation::West;
                     }
     
                 }
             }
         }
+
+        tmp = direction;
+        direction = direction_rb2;
+    }
+        
     
     
 }
@@ -80,7 +89,7 @@ fn main() {
     let R = &Instruction::R;
     let L = &Instruction::L;
     
-    let mut direction_robot1  = &Orientation::North;
+    let mut direction_robot1  = Orientation::North;
     let mut direction_robot2 = Orientation::South;
 
     let instruction_robot1 = vec![F,L,L,F,R,F];
@@ -100,10 +109,10 @@ fn main() {
         instruction_robot2.len()
     };
 
-    for i in 0..5{
-        game(instruction_robot1[i],robot1,direction_robot1);
+    game(instruction_robot1,robot1,robot2,direction_robot1,direction_robot2);
+    println!("{}{}",robot1.x,robot1.y);
 
-    }
+    
 
     
 
