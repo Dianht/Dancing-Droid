@@ -59,30 +59,30 @@ fn main() {
                             }
                         }
                         Orientation::West => {
-                            if robot2.x - 1 == robot1.x && robot2.y == robot1.y {
+                            if robot1.x - 1 == robot2.x && robot1.y == robot2.y {
                                 println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                            }else if robot2.x - 1 == -1 {
+                            }else if robot1.x - 1 == -1 {
                                 println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),robot1.id);
                             }else {
-                                robot2.x = robot2.x - 1;
+                                robot1.x = robot1.x - 1;
                             }
                         }
                         Orientation::Est => {
-                            if robot2.x + 1 == robot1.x && robot2.y == robot1.y {
+                            if robot1.x + 1 == robot2.x && robot1.y == robot2.y {
                                 println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                            } else if robot2.x + 1 == limite_x + 1{
+                            } else if robot1.x + 1 == limite_x + 1{
                                 println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),robot1.id);
                             }else {    
-                                robot2.x = robot2.x + 1;
+                                robot1.x = robot1.x + 1;
                             }
                         }
                         Orientation::South =>{
-                            if robot2.x == robot1.x && robot2.y - 1 == robot1.y {
+                            if robot1.x == robot2.x && robot1.y - 1 == robot2.y {
                                 println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                            } else if robot2.y - 1 == -1 {
+                            } else if robot1.y - 1 == -1 {
                                 println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),robot1.id);
                             }else {
-                                robot2.y = robot2.y - 1;
+                                robot1.y = robot1.y - 1;
                             }
                         }
                     }
