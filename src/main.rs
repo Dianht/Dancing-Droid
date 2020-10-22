@@ -17,25 +17,15 @@ struct Robot {
     y: i32,
 }
 
-
-
-fn main() {
-
+//Il faudrait qu'on optimise tout sa pour qu'on puisse utiliser cette fonction un robot par un (je peux le faire sans cette enum de m*)
+fn game(instruction_robot1 : Vec<&Instruction>,robot1 : &mut Robot,direc_rb1: Orientation,instruction_robot2 : Vec<&Instruction>,robot2 : &mut Robot,direc_rb2: Orientation){
     
-    let limite_x : i32 = 5;
-    let limite_y : i32 = 5;
-    
-    let mut direction_robot1 = Orientation::North;
-    let mut direction_robot2 = Orientation::South;
+    let limite_y = 5;
+    let limite_x = 5;
 
-    let instruction_robot1 = vec![Instruction::F,Instruction::L,Instruction::L,Instruction::F,Instruction::R,Instruction::F];
-    let instruction_robot2 = vec![Instruction::F,Instruction::F,Instruction::L,Instruction::F,Instruction::R,Instruction::R,Instruction::F];
-    let mut vecteur = vec![Robot{ id: 0,x: 1,y: 1 },
-                             Robot{ id: 1,x: 3,y: 2}];
+    let mut direction1 = direc_rb1;
+    let mut direction2 = direc_rb2; 
 
-    let (rb1,rb2) = vecteur.split_at_mut(1);    
-    let mut robot1 = &mut rb1[0];
-    let mut robot2 = &mut rb2[0];
     let taille = 
     if instruction_robot1.len() > instruction_robot2.len(){              //On prend la plus grande taille des deux vecteurs
         instruction_robot1.len()
@@ -43,12 +33,11 @@ fn main() {
         instruction_robot2.len()
     };
 
-
     for i in 0..taille {
         if i < instruction_robot1.len() {
             match instruction_robot1[i]{
                 Instruction::F => {
-                    match direction_robot1 {
+                    match direction1 {
                         Orientation::North => {
                             if robot1.x == robot2.x && robot1.y + 1 == robot2.y {
                                 println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
@@ -88,43 +77,43 @@ fn main() {
                     }
                 }
                 Instruction::L => {
-                    match direction_robot1 {
+                    match direction1 {
                         Orientation::North => {
-                            direction_robot1 = Orientation::West;
+                            direction1 = Orientation::West;
                         }
                         Orientation::West => {
-                            direction_robot1 = Orientation::South;
+                            direction1 = Orientation::South;
                         }
                         Orientation::Est => {
-                            direction_robot1 = Orientation::North;
+                            direction1 = Orientation::North;
                         }
                         Orientation::South => {
-                            direction_robot1 = Orientation::Est;
+                            direction1 = Orientation::Est;
                         }
                     }
                 }
                 Instruction::R => {
-                    match direction_robot1 {
+                    match direction1 {
                         Orientation::North => {
-                            direction_robot1 = Orientation::Est;
+                            direction1 = Orientation::Est;
                         }
                         Orientation::West => {
-                            direction_robot1 = Orientation::North;
+                            direction1 = Orientation::North;
                         }
                         Orientation::Est => {
-                            direction_robot1 = Orientation::South;
+                            direction1 = Orientation::South;
                         }
                         Orientation::South => {
-                            direction_robot1 = Orientation::West;
+                            direction1 = Orientation::West;
                         }
                     }
                 }
             }
-        }
+        }   
         if i < instruction_robot2.len() {
             match instruction_robot2[i]{
                 Instruction::F => {
-                    match direction_robot2 {
+                    match direction2 {
                         Orientation::North => {
                             if robot2.x == robot1.x && robot2.y + 1 == robot1.y{
                                 println!("Collision ! du Robot <{}> aux  coordonnées x:{}, y:{}",robot2.id,robot2.x,robot2.y);
@@ -164,34 +153,34 @@ fn main() {
                     }
                 }
                 Instruction::L => {
-                    match direction_robot2 {
+                    match direction2 {
                         Orientation::North => {
-                            direction_robot2 = Orientation::West;
+                            direction2 = Orientation::West;
                         }
                         Orientation::West => {
-                            direction_robot2 = Orientation::South;
+                            direction2 = Orientation::South;
                         }
                         Orientation::Est => {
-                            direction_robot2 = Orientation::North;
+                            direction2 = Orientation::North;
                         }
                         Orientation::South => {
-                            direction_robot2 = Orientation::Est;
+                            direction2 = Orientation::Est;
                         }
                     }
                 }
                 Instruction::R => {
-                    match direction_robot2 {
+                    match direction2 {
                         Orientation::North => {
-                            direction_robot2 = Orientation::Est;
+                            direction2 = Orientation::Est;
                         }
                         Orientation::West => {
-                            direction_robot2 = Orientation::North;
+                            direction2 = Orientation::North;
                         }
                         Orientation::Est => {
-                            direction_robot2 = Orientation::South;
+                            direction2 = Orientation::South;
                         }
                         Orientation::South => {
-                            direction_robot2 = Orientation::West;
+                            direction2 = Orientation::West;
                         }
                     }
                 }
@@ -199,13 +188,29 @@ fn main() {
         }
         
     }
+
+}
+
+fn main() {
+
+    let f = &Instruction::F;
+    let r = &Instruction::R;
+    let l = &Instruction::L;
     
+    let direction_robot1 = Orientation::North;      // essaie de donner les valeurs de l'orientation ici
+    let direction_robot2 = Orientation::South;      
+
+    let instruction_robot1 = vec![f,l,l,f,r,f];
+    let instruction_robot2 = vec![f,f,l,f,r,r,f];
     
+    let mut vecteur = vec![Robot{ id: 0,x: 1,y: 1 },
+                             Robot{ id: 1,x: 3,y: 2}];
 
+    let (rb1,rb2) = vecteur.split_at_mut(1);    
+    let  robot1 = &mut rb1[0];
+    let  robot2 = &mut rb2[0];
 
-
-    
-
+    game(instruction_robot1,robot1,direction_robot1,instruction_robot2,robot2,direction_robot2);
 
     println!("{} du {}<{}> final x : {} y : {}","Position".blue(),"Robot".magenta(),robot1.id,robot1.x,robot1.y);
     println!("{} du {}<{}> final x : {} y : {}","Position".blue(),"Robot".cyan(),robot2.id,robot2.x,robot2.y);
