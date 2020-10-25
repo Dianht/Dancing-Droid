@@ -33,7 +33,7 @@ fn collision(tmp_x : i32,tmp_y :i32,robot1 :&mut Robot,robot2 :&mut Robot,lim_x 
 fn game(instruction_robot : &Instruction,robot :&mut Robot){
     match instruction_robot{
         Instruction::F => {
-            match &robot.orientation{
+            match robot.orientation{
                 Orientation::North => robot.y = robot.y + 1,
                 Orientation::West => robot.x = robot.x - 1,
                 Orientation::Est => robot.x = robot.x + 1,
@@ -41,7 +41,7 @@ fn game(instruction_robot : &Instruction,robot :&mut Robot){
             }
         }
         Instruction::L => {
-            match &robot.orientation{
+            match robot.orientation{
                 Orientation::North  => robot.orientation =  Orientation::West,
                 Orientation::West => robot.orientation = Orientation::South,
                 Orientation::Est => robot.orientation = Orientation::North,
@@ -49,7 +49,7 @@ fn game(instruction_robot : &Instruction,robot :&mut Robot){
             }
         }
         Instruction::R => {
-            match &robot.orientation {
+            match robot.orientation {
                 Orientation::North => robot.orientation =  Orientation::Est,
                 Orientation::West => robot.orientation = Orientation::North,
                 Orientation::Est => robot.orientation = Orientation::South,
