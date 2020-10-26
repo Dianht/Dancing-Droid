@@ -26,7 +26,7 @@ fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,
             if une > 0{     //hehe
                 println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),vec[m].id,vec[m].x,vec[m].y);
                 vec[m].x = tmp_x;
-                vec[m].x = tmp_y;
+                vec[m].y = tmp_y;
             }
             une += 1;   //hehe
         }
