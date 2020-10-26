@@ -18,16 +18,26 @@ struct Robot<'a> {
     instruction : Vec<&'a Instruction>,
 }
 
-fn collision(tmp_x : i32,tmp_y :i32,robot1 :&mut Robot,robot2 :&mut Robot,lim_x :i32,lim_y:i32){
-    if robot1.x == robot2.x && robot1.y == robot2.y{
-        println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),robot1.id,robot1.x,robot2.y);
-        robot1.x = tmp_x;
-        robot1.y = tmp_y; 
-    }
-    else if robot1.x == lim_x + 1 || robot1.x < 0 || robot1.y == lim_y + 1|| robot1.y < 0{
-        println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),robot1.id);
-        robot1.x = tmp_x;
-        robot1.y = tmp_y;
+fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
+    //Il faut trouver une autre solution (la boucle en bas va comparer au moins une fois la position du robot m avec elle meme)
+    let mut une = 0;        
+    for i in 0..vec.len(){
+        if vec[m].x == vec[i].x && vec[m].y == vec[i].y{
+            if une > 0{     //hehe
+                println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),vec[m].id,vec[m].x,vec[m].y);
+                vec[m].x = tmp_x;
+                vec[m].x = tmp_y;
+            }
+            une += 1;   //hehe
+        }
+        else if vec[m].x == lim_x + 1 || vec[m].x < 0 || vec[m].y == lim_y + 1|| vec[m].y < 0{
+            if une > 0{ //hehe
+                println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),vec[m].id);
+                vec[m].x = tmp_x;
+                vec[m].y = tmp_y;
+            }
+            une += 1;
+        }  
     }
 }
 
@@ -67,10 +77,6 @@ fn main() {
     let l = &Instruction::L;
     let lim_x = 5;
     let lim_y = 5;
-     
-    
-    let instruction_robot1 = vec![f,l,l,f,f,f];
-    let instruction_robot2 = vec![r,f,l,f,r,r,f];
     
     let mut vec = Vec::new();
 
@@ -98,8 +104,9 @@ fn main() {
     for x in 0..taille{
         for i in 0..vec.len(){
             if x < vec[i].instruction.len() {
-                game(vec[i].instruction[x],& mut vec[i]);
-
+                tmp = (vec[i].x,vec[i].y);
+                game(vec[i].instruction[x],& mut vec[i]);                               
+                collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
             }  
         }
     }
