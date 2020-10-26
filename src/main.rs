@@ -18,6 +18,36 @@ struct Robot<'a> {
     instruction : Vec<&'a Instruction>,
 }
 
+fn initial_final(vec :&mut Vec<Robot>,position : String){  
+    println!("\n");
+    for i in 0..vec.len(){
+        println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".yellow(),vec[i].id,vec[i].x,vec[i].y);
+    }
+    println!("\n");
+}
+fn game(lim_x : i32,lim_y : i32,mut vec :&mut Vec<Robot>){
+    
+    let mut taille = vec[0].instruction.len();
+    for i in 0..vec.len() - 1{
+        if taille > vec[i + 1].instruction.len(){
+            taille = vec[i].instruction.len();
+        }
+        else {
+            taille = vec[i + 1].instruction.len()
+        }
+    }
+
+    let mut tmp :(i32,i32);
+    for x in 0..taille{
+        for i in 0..vec.len(){
+            if x < vec[i].instruction.len() {
+                tmp = (vec[i].x,vec[i].y);
+                instruction(vec[i].instruction[x],& mut vec[i]);                               
+                collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
+            }  
+        }
+    }
+}
 fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
     //Il faut trouver une autre solution (la boucle en bas va comparer au moins une fois la position du robot m avec elle meme)
     let mut une = 0;        
@@ -40,8 +70,7 @@ fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,
         }  
     }
 }
-
-fn game(instruction_robot : &Instruction,robot :&mut Robot){
+fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
     match instruction_robot{
         Instruction::F => {
             match robot.orientation{
@@ -77,43 +106,25 @@ fn main() {
     let l = &Instruction::L;
     let lim_x = 5;
     let lim_y = 5;
+
     
     let mut vec = Vec::new();
 
     // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
-    let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![f,l,l,f,f,f]};
+    let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![l,f,f,f,f,f]};
     vec.push(rb);
-    let rb = Robot{ id: 1,x: 3,y: 2,orientation: Orientation::South,instruction : vec![r,f,l,f,r,r,f]};
+    let rb = Robot{ id: 1,x: 1,y: 2,orientation: Orientation::South,instruction : vec![f,f,l,f,r,r,f]};
     vec.push(rb);
     let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
     vec.push(rb);
-   
-    
-    let mut tmp :(i32,i32);
+    //
 
-    let mut taille = vec[0].instruction.len();
-    for i in 0..vec.len() - 1{
-        if taille > vec[i + 1].instruction.len(){
-            taille = vec[i].instruction.len();
-        }
-        else {
-            taille = vec[i + 1].instruction.len()
-        }
-    }
 
-    for x in 0..taille{
-        for i in 0..vec.len(){
-            if x < vec[i].instruction.len() {
-                tmp = (vec[i].x,vec[i].y);
-                game(vec[i].instruction[x],& mut vec[i]);                               
-                collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
-            }  
-        }
-    }
+
+    initial_final(&mut vec,"Position initial".to_string());
+    game(lim_x,lim_y,&mut vec);
+    initial_final(&mut vec,"Position finale".to_string());
     
-    for i in 0..vec.len(){
-        println!("\n{} du {}<{}>  x : {} y : {}","Position finale".magenta(),"Robot".yellow(),vec[i].id,vec[i].x,vec[i].y);
-    }
         
 }
 
