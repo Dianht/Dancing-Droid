@@ -1,8 +1,6 @@
 use colored::*;
 use std::fmt; // On importe le module `fmt`
-use std::fmt::Debug;
 
-#[derive(Debug)]
 struct Robot {
     id: i32,
     x: i32,
@@ -13,10 +11,9 @@ struct Robot {
 impl fmt::Display for Robot {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
-        write!(f, "({}, {},  {})", self.id, self.x,self.y)
+        write!(f, "id = {}, x = {}, y = {}, orientation = {}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
     }
 }
-#[derive(Debug)]
 struct Terrain {
     x : i32,
     y : i32,
@@ -25,7 +22,7 @@ struct Terrain {
 impl fmt::Display for Terrain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
-        write!(f, "({}, {})", self.x, self.y)
+        write!(f, "x_max = {}, y_max = {}", self.x, self.y)
     }
 }
 
@@ -94,7 +91,7 @@ fn instruction(instruction_robot : char,robot :&mut Robot){
                 'W' => robot.x = robot.x - 1,
                 'E' => robot.x = robot.x + 1,
                 'S' => robot.y = robot.y - 1,
-                _ => println!("ok"),
+                _ => println!("Je ne comprends où vous voulez allez"),
             }
         }
         'L' => {
@@ -103,7 +100,7 @@ fn instruction(instruction_robot : char,robot :&mut Robot){
                 'W' => robot.orientation = 'S',
                 'E' => robot.orientation = 'N',
                 'S' => robot.orientation = 'E',
-                _ => println!("ok"),
+                _ => println!("Je ne comprends où vous voulez allez"),
             }
         }
         'R' => {
@@ -112,7 +109,7 @@ fn instruction(instruction_robot : char,robot :&mut Robot){
                 'W' => robot.orientation = 'N',
                 'E' => robot.orientation = 'S',
                 'S' => robot.orientation = 'W',
-                _ => println!("ok"),
+                _ => println!("Je ne comprends où vous voulez allez"),
             }
         }
         _ => {
@@ -124,9 +121,6 @@ fn instruction(instruction_robot : char,robot :&mut Robot){
 fn main() {
 
     let limite = Terrain{ x : 5,y : 5};
-
-
-    
     let mut robot = Vec::new();
 
     // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
@@ -144,15 +138,14 @@ fn main() {
     game(limite.x,limite.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
 
-    println!("{:?}",limite);
-    println!("{:?}",robot);
+    println!("Terrain {{ {} }}",limite);
+    println!("Robots [");
+    for i in 0..robot.len(){
+        println!("{{ {} }},",robot[i]);
+    }
+    println!("]");
     
+
         
 }
-
-
-
-
-
-
 
