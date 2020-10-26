@@ -27,6 +27,7 @@ fn initial_final(vec :&mut Vec<Robot>,position : String){
 }
 fn game(lim_x : i32,lim_y : i32,mut vec :&mut Vec<Robot>){
     
+    //On trouve le grand nombre d'instruction qu'a un robots
     let mut taille = vec[0].instruction.len();
     for i in 0..vec.len() - 1{
         if taille > vec[i + 1].instruction.len(){
@@ -36,11 +37,12 @@ fn game(lim_x : i32,lim_y : i32,mut vec :&mut Vec<Robot>){
             taille = vec[i + 1].instruction.len()
         }
     }
-
+    // Nous permetra de stocker les valeurs des coordonées du robot avant l'instruction
     let mut tmp :(i32,i32);
-    for x in 0..taille{
-        for i in 0..vec.len(){
-            if x < vec[i].instruction.len() {
+    //Une boucle jusqu'à que le robot avec le + d'instruction n'aura plus d'instruction
+    for x in 0..taille{                             
+        for i in 0..vec.len(){              //Une boucle qui fera jouer les robots un par un
+            if x < vec[i].instruction.len() {           //On ignorera les Robot qui n'ont plus d'instruction
                 tmp = (vec[i].x,vec[i].y);
                 instruction(vec[i].instruction[x],& mut vec[i]);                               
                 collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
@@ -118,8 +120,6 @@ fn main() {
     let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
     vec.push(rb);
     //
-
-
 
     initial_final(&mut vec,"Position initial".to_string());
     game(lim_x,lim_y,&mut vec);
