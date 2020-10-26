@@ -18,60 +18,63 @@ struct Robot<'a> {
     instruction : Vec<&'a Instruction>,
 }
 
-fn initial_final(vec :&mut Vec<Robot>,position : String){  
+fn initial_final(robot :&mut Vec<Robot>,position : String){  
     println!("\n");
-    for i in 0..vec.len(){
-        println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".yellow(),vec[i].id,vec[i].x,vec[i].y);
+    for i in 0..robot.len(){
+        println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".blue(),robot[i].id,robot[i].x,robot[i].y);
     }
     println!("\n");
 }
-fn game(lim_x : i32,lim_y : i32,mut vec :&mut Vec<Robot>){
+
+fn game(lim_x : i32,lim_y : i32,mut robot :&mut Vec<Robot>){
     
     //On trouve le grand nombre d'instruction qu'a un robots
-    let mut taille = vec[0].instruction.len();
-    for i in 0..vec.len() - 1{
-        if taille > vec[i + 1].instruction.len(){
-            taille = vec[i].instruction.len();
+    let mut taille = robot[0].instruction.len();
+    for i in 0..robot.len() - 1{
+        if taille > robot[i + 1].instruction.len(){
+            taille = robot[i].instruction.len();
         }
         else {
-            taille = vec[i + 1].instruction.len()
+            taille = robot[i + 1].instruction.len()
         }
     }
     // Nous permetra de stocker les valeurs des coordonées du robot avant l'instruction
     let mut tmp :(i32,i32);
     //Une boucle jusqu'à que le robot avec le + d'instruction n'aura plus d'instruction
-    for x in 0..taille{                             
-        for i in 0..vec.len(){              //Une boucle qui fera jouer les robots un par un
-            if x < vec[i].instruction.len() {           //On ignorera les Robot qui n'ont plus d'instruction
-                tmp = (vec[i].x,vec[i].y);
-                instruction(vec[i].instruction[x],& mut vec[i]);                               
-                collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
+    for x in 0..taille{       
+                              
+        for i in 0..robot.len(){              //Une boucle qui fera jouer les robots un par un
+            if x < robot[i].instruction.len() {           //On ignorera les Robot qui n'ont plus d'instruction
+                tmp = (robot[i].x,robot[i].y);
+                instruction(robot[i].instruction[x],& mut robot[i]);                               
+                collision(tmp.0,tmp.1,&mut robot, lim_y,lim_x,i);  
             }  
         }
     }
 }
-fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
-    //Il faut trouver une autre solution (la boucle en bas va comparer au moins une fois la position du robot m avec elle meme)
-    let mut une = 0;        
-    for i in 0..vec.len(){
-        if vec[m].x == vec[i].x && vec[m].y == vec[i].y{
-            if une > 0{     //hehe
-                println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),vec[m].id,vec[m].x,vec[m].y);
-                vec[m].x = tmp_x;
-                vec[m].y = tmp_y;
+
+fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
+
+    for i in 0..robot.len(){
+
+        if robot[m].x == robot[i].x && robot[m].y == robot[i].y{
+            if robot[m].id != robot[i].id{     //hehe
+                println!("{} 💥\n{}<{}> fonce vers {}<{}> aux coordonnée x : {} y : {} !","Collision !".red(),"Le Robot".cyan(),robot[m].id,"le Robot".green(),robot[i].id,robot[m].x,robot[m].y);
+                robot[m].x = tmp_x;
+                robot[m].y = tmp_y;
             }
-            une += 1;   //hehe
         }
-        else if vec[m].x == lim_x + 1 || vec[m].x < 0 || vec[m].y == lim_y + 1|| vec[m].y < 0{
-            if une > 0{ //hehe
-                println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),vec[m].id);
-                vec[m].x = tmp_x;
-                vec[m].y = tmp_y;
+
+        else if robot[m].x == lim_x + 1 || robot[m].x < 0 || robot[m].y == lim_y + 1|| robot[m].y < 0{
+            if robot[m].id != robot[i].id{ 
+                println!("{} 🚧\n{}<{}> se dirige vers les limites de la map !","Attention !".red(),"Le Robot".yellow(),robot[m].id);
+                robot[m].x = tmp_x;
+                robot[m].y = tmp_y;
             }
-            une += 1;
         }  
     }
 }
+
 fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
     match instruction_robot{
         Instruction::F => {
@@ -110,20 +113,22 @@ fn main() {
     let lim_y = 5;
 
     
-    let mut vec = Vec::new();
+    let mut robot = Vec::new();
 
     // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
     let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![l,f,f,f,f,f]};
-    vec.push(rb);
+    robot.push(rb);
     let rb = Robot{ id: 1,x: 1,y: 2,orientation: Orientation::South,instruction : vec![f,f,l,f,r,r,f]};
-    vec.push(rb);
+    robot.push(rb);
     let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
-    vec.push(rb);
+    robot.push(rb);
+    let rb = Robot{ id: 3,x: 1,y: 0,orientation: Orientation::West,instruction : vec![f,l,f,f,r,r,r,f,l,f]};
+    robot.push(rb);
     //
 
-    initial_final(&mut vec,"Position initial".to_string());
-    game(lim_x,lim_y,&mut vec);
-    initial_final(&mut vec,"Position finale".to_string());
+    initial_final(&mut robot,"Position initial".to_string());
+    game(lim_x,lim_y,&mut robot);
+    initial_final(&mut robot,"Position finale".to_string());
     
         
 }
