@@ -10,23 +10,34 @@ enum Instruction {
     L,
     R,
 }
-struct Robot {
+struct Robot<'a> {
     id: i32,
     x: i32,
     y: i32,
     orientation : Orientation,
+    instruction : Vec<&'a Instruction>,
 }
 
-fn collision(tmp_x : i32,tmp_y :i32,robot1 :&mut Robot,robot2 :&mut Robot,lim_x :i32,lim_y:i32){
-    if robot1.x == robot2.x && robot1.y == robot2.y{
-        println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),robot1.id,robot1.x,robot2.y);
-        robot1.x = tmp_x;
-        robot1.y = tmp_y; 
-    }
-    else if robot1.x == lim_x + 1 || robot1.x < 0 || robot1.y == lim_y + 1|| robot1.y < 0{
-        println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),robot1.id);
-        robot1.x = tmp_x;
-        robot1.y = tmp_y;
+fn collision(tmp_x : i32,tmp_y :i32,vec :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
+    //Il faut trouver une autre solution (la boucle en bas va comparer au moins une fois la position du robot m avec elle meme)
+    let mut une = 0;        
+    for i in 0..vec.len(){
+        if vec[m].x == vec[i].x && vec[m].y == vec[i].y{
+            if une > 0{     //hehe
+                println!("{} du robot<{}> aux coordonnée x : {} y : {}","Collision !".red(),vec[m].id,vec[m].x,vec[m].y);
+                vec[m].x = tmp_x;
+                vec[m].x = tmp_y;
+            }
+            une += 1;   //hehe
+        }
+        else if vec[m].x == lim_x + 1 || vec[m].x < 0 || vec[m].y == lim_y + 1|| vec[m].y < 0{
+            if une > 0{ //hehe
+                println!("{}  le Robot<{}>! se dirige vers les limites de la map 😮 !","Attention !".red(),vec[m].id);
+                vec[m].x = tmp_x;
+                vec[m].y = tmp_y;
+            }
+            une += 1;
+        }  
     }
 }
 
@@ -66,36 +77,49 @@ fn main() {
     let l = &Instruction::L;
     let lim_x = 5;
     let lim_y = 5;
-     
     
-    let instruction_robot1 = vec![f,l,l,f,f,f];
-    let instruction_robot2 = vec![r,f,l,f,r,r,f];
-    
-    let mut vecteur = vec![Robot{ id: 0,x: 3,y: 3,orientation: Orientation::South},
-                             Robot{ id: 1,x: 3,y: 2,orientation: Orientation::West}];
+    let mut vec = Vec::new();
 
-    let (rb1,rb2) = vecteur.split_at_mut(1);    
-    let  robot1 = &mut rb1[0];
-    let  robot2 = &mut rb2[0];
+    // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
+    let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![f,l,l,f,f,f]};
+    vec.push(rb);
+    let rb = Robot{ id: 1,x: 3,y: 2,orientation: Orientation::South,instruction : vec![r,f,l,f,r,r,f]};
+    vec.push(rb);
+    let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
+    vec.push(rb);
+   
     
     let mut tmp :(i32,i32);
-    let taille = if instruction_robot1.len() > instruction_robot2.len(){instruction_robot1.len()}else {instruction_robot2.len()};
 
-
-    for i in 0..taille{
-        if i < instruction_robot1.len() {
-            tmp = (robot1.x,robot1.y);
-            game(instruction_robot1[i],robot1);
-            collision(tmp.0,tmp.1,robot1,robot2,lim_x,lim_y);
+    let mut taille = vec[0].instruction.len();
+    for i in 0..vec.len() - 1{
+        if taille > vec[i + 1].instruction.len(){
+            taille = vec[i].instruction.len();
         }
-        if i < instruction_robot2.len() {
-            tmp = (robot2.x,robot2.y);
-            collision(tmp.0,tmp.1,robot2,robot1,lim_x,lim_y);
-            game(instruction_robot2[i],robot2);
+        else {
+            taille = vec[i + 1].instruction.len()
         }
     }
-    println!("\n{} du {}<{}>  x : {} y : {}","Position finale".magenta(),"Robot".yellow(),robot1.id,robot1.x,robot1.y);
-    println!("{} du {}<{}> final x : {} y : {}","Position finale".magenta(),"Robot".cyan(),robot2.id,robot2.x,robot2.y);
+
+    for x in 0..taille{
+        for i in 0..vec.len(){
+            if x < vec[i].instruction.len() {
+                tmp = (vec[i].x,vec[i].y);
+                game(vec[i].instruction[x],& mut vec[i]);                               
+                collision(tmp.0,tmp.1,&mut vec, lim_y,lim_x,i);  
+            }  
+        }
+    }
+    
+    for i in 0..vec.len(){
+        println!("\n{} du {}<{}>  x : {} y : {}","Position finale".magenta(),"Robot".yellow(),vec[i].id,vec[i].x,vec[i].y);
+    }
         
 }
-    
+
+
+
+
+
+
+
