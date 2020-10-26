@@ -74,26 +74,39 @@ fn main() {
     
     let mut vec = Vec::new();
 
+    // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
     let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![f,l,l,f,f,f]};
     vec.push(rb);
     let rb = Robot{ id: 1,x: 3,y: 2,orientation: Orientation::South,instruction : vec![r,f,l,f,r,r,f]};
     vec.push(rb);
+    let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
+    vec.push(rb);
    
     
     let mut tmp :(i32,i32);
-    let taille = if instruction_robot1.len() > instruction_robot2.len(){instruction_robot1.len()}else {instruction_robot2.len()};
+
+    let mut taille = vec[0].instruction.len();
+    for i in 0..vec.len() - 1{
+        if taille > vec[i + 1].instruction.len(){
+            taille = vec[i].instruction.len();
+        }
+        else {
+            taille = vec[i + 1].instruction.len()
+        }
+    }
 
     for x in 0..taille{
         for i in 0..vec.len(){
             if x < vec[i].instruction.len() {
                 game(vec[i].instruction[x],& mut vec[i]);
-                
+
             }  
         }
     }
     
-    println!("\n{} du {}<{}>  x : {} y : {}","Position finale".magenta(),"Robot".yellow(),vec[0].id,vec[0].x,vec[0].y);
-    println!("{} du {}<{}> final x : {} y : {}","Position finale".magenta(),"Robot".cyan(),vec[1].id,vec[1].x,vec[0].y);
+    for i in 0..vec.len(){
+        println!("\n{} du {}<{}>  x : {} y : {}","Position finale".magenta(),"Robot".yellow(),vec[i].id,vec[i].x,vec[i].y);
+    }
         
 }
 
