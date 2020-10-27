@@ -1,5 +1,6 @@
-use colored::*;
+use colored::*; //gadjet il faudra modifier le cargo.toml
 use std::fmt; // On importe le module `fmt`
+
 #[derive(Debug)]
 enum Orientation {
     North,
@@ -27,19 +28,6 @@ struct Terrain {
     y : i32,
 }
 
-impl fmt::Display for Terrain {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
-        write!(f, "x_max = {}, y_max = {}", self.x, self.y)
-    }
-}
-
-impl <'a> fmt::Display for Robot<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
-        write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
-    }
-}
 
 fn initial_final(robot :&mut Vec<Robot>,position : String){  
     println!("\n");
@@ -126,13 +114,34 @@ fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
         }
     }
 }   
+fn display(robot : Vec<Robot>,terrain : Terrain){
+    println!("Terrain {{ {} }}",terrain);
 
+    println!("Robots {{");
+    for i in 0..robot.len(){
+        println!("  {{ {}, }}",robot[i]);
+    }
+    println!("}}");
+}
+
+impl fmt::Display for Terrain {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "x_max = {}, y_max = {}", self.x, self.y)
+    }
+}
+
+impl <'a> fmt::Display for Robot<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
+    }
+}
 fn main() {
 
     let f = &Instruction::F;
     let r = &Instruction::R;
     let l = &Instruction::L;
-    let taille = Terrain {x : 5,y : 8};
+    let terrain = Terrain {x : 5,y : 8};
     
     let mut robot = Vec::new();
 
@@ -148,16 +157,10 @@ fn main() {
     //
 
     initial_final(&mut robot,"Position initial".to_string());
-    game(taille.x,taille.y,&mut robot);
+    game(terrain.x,terrain.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
+    display(robot,terrain);
     
-    println!("Terrain {{ {} }}",taille);
-
-    println!("Robots {{");
-    for i in 0..robot.len(){
-        println!("  {{ {}, }}",robot[i]);
-    }
-    println!("}}");
     
 
         
