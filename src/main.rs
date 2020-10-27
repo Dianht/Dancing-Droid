@@ -154,7 +154,7 @@ fn main() {
     robot.push(rb);
     let rb = Robot{ id: 3,x: 1,y: 0,orientation: Orientation::West,instruction : vec![f,l,f,f,r,r,r,f,l,f]};
     robot.push(rb);
-    //
+    //push chaque robot dans le vecteur
 
     initial_final(&mut robot,"Position initial".to_string());
     game(terrain.x,terrain.y,&mut robot);
