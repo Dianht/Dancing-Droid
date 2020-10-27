@@ -1,19 +1,27 @@
 use colored::*;
 use std::fmt; // On importe le module `fmt`
-
-struct Robot {
+#[derive(Debug)]
+enum Orientation {
+    North,
+    West,
+    South,
+    Est,
+}
+#[derive(Debug)]
+enum Instruction {
+    F,
+    L,
+    R,
+}
+#[derive(Debug)]
+struct Robot<'a> {
     id: i32,
     x: i32,
     y: i32,
-    orientation : char,
-    instruction : Vec<char>,
+    orientation : Orientation,
+    instruction : Vec<&'a Instruction>,
 }
-impl fmt::Display for Robot {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
-        write!(f, "id = {}, x = {}, y = {}, orientation = {}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
-    }
-}
 struct Terrain {
     x : i32,
     y : i32,
@@ -23,6 +31,13 @@ impl fmt::Display for Terrain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
         write!(f, "x_max = {}, y_max = {}", self.x, self.y)
+    }
+}
+
+impl <'a> fmt::Display for Robot<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
     }
 }
 
@@ -83,69 +98,74 @@ fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i3
     }
 }
 
-fn instruction(instruction_robot : char,robot :&mut Robot){
+fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
     match instruction_robot{
-        'F' => {
+        Instruction::F => {
             match robot.orientation{
-                'N' => robot.y = robot.y + 1,
-                'W' => robot.x = robot.x - 1,
-                'E' => robot.x = robot.x + 1,
-                'S' => robot.y = robot.y - 1,
-                _ => println!("Je ne comprends où vous voulez allez"),
+                Orientation::North => robot.y = robot.y + 1,
+                Orientation::West => robot.x = robot.x - 1,
+                Orientation::Est => robot.x = robot.x + 1,
+                Orientation::South => robot.y = robot.y - 1,
             }
         }
-        'L' => {
+        Instruction::L => {
             match robot.orientation{
-                'N'  => robot.orientation =  'W',
-                'W' => robot.orientation = 'S',
-                'E' => robot.orientation = 'N',
-                'S' => robot.orientation = 'E',
-                _ => println!("Je ne comprends où vous voulez allez"),
+                Orientation::North  => robot.orientation =  Orientation::West,
+                Orientation::West => robot.orientation = Orientation::South,
+                Orientation::Est => robot.orientation = Orientation::North,
+                Orientation::South => robot.orientation = Orientation::Est,
             }
         }
-        'R' => {
+        Instruction::R => {
             match robot.orientation {
-                'N' => robot.orientation =  'E',
-                'W' => robot.orientation = 'N',
-                'E' => robot.orientation = 'S',
-                'S' => robot.orientation = 'W',
-                _ => println!("Je ne comprends où vous voulez allez"),
+                Orientation::North => robot.orientation =  Orientation::Est,
+                Orientation::West => robot.orientation = Orientation::North,
+                Orientation::Est => robot.orientation = Orientation::South,
+                Orientation::South => robot.orientation = Orientation::West,
             }
-        }
-        _ => {
-            println!("ok");
         }
     }
 }   
 
 fn main() {
 
-    let limite = Terrain{ x : 5,y : 5};
+    let f = &Instruction::F;
+    let r = &Instruction::R;
+    let l = &Instruction::L;
+    let taille = Terrain {x : 5,y : 8};
+    
     let mut robot = Vec::new();
 
     // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
-    let rb = Robot{ id: 0,x: 1,y: 1,orientation: 'N', instruction : vec!['L','F','F','F','F','F']};
+    let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![l,f,f,f,f,f]};
     robot.push(rb);
-    let rb = Robot{ id: 1,x: 1,y: 2,orientation: 'S',instruction : vec!['F','F','L','F','R','R','F']};
+    let rb = Robot{ id: 1,x: 1,y: 2,orientation: Orientation::South,instruction : vec![f,f,l,f,r,r,f]};
     robot.push(rb);
-    let rb = Robot{ id: 2,x: 4,y: 1,orientation: 'W',instruction : vec!['F','R','R','F','L','F','F','F','L','R']};
+    let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
     robot.push(rb);
-    let rb = Robot{ id: 3,x: 1,y: 0,orientation: 'E',instruction : vec!['F','L','F','F','R','R','R','F','L','F']};
+    let rb = Robot{ id: 3,x: 1,y: 0,orientation: Orientation::West,instruction : vec![f,l,f,f,r,r,r,f,l,f]};
     robot.push(rb);
     //
 
     initial_final(&mut robot,"Position initial".to_string());
-    game(limite.x,limite.y,&mut robot);
+    game(taille.x,taille.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
+    
+    println!("Terrain {{ {} }}",taille);
 
-    println!("Terrain {{ {} }}",limite);
-    println!("Robots [");
+    println!("Robots {{");
     for i in 0..robot.len(){
-        println!("{{ {} }},",robot[i]);
+        println!("  {{ {}, }}",robot[i]);
     }
-    println!("]");
+    println!("}}");
     
 
         
 }
+
+
+
+
+
+
 
