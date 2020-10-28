@@ -31,7 +31,7 @@ struct Terrain {
 }
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
                                 //Projet/DancingDroids/two_robots.txt
-    let mut file = File::open("/media/dinathsh/DinaStockage/Université/Licence 2/Programmation Avancé/Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
+    let mut file = File::open("Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
     let mut s = String::new();
     file.read_to_string(&mut s).expect("Impossible de lire le fichier");
     let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
@@ -52,6 +52,7 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
     }
     return terrain;
 }
+
 fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32) {
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
     let mut position : Vec<i32> = Vec::new();
@@ -172,8 +173,8 @@ fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
     }
 }   
 fn display(robot :&mut Vec<Robot>,terrain :&mut Terrain){
+    
     println!("Terrain {{ {} }}",terrain);
-
     println!("Robots {{");
     for i in 0..robot.len(){
         println!("  {{ {}, }}",robot[i]);
@@ -189,7 +190,6 @@ impl fmt::Display for Terrain {
 
 impl <'a> fmt::Display for Robot<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
         write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
     }
 }
@@ -201,10 +201,7 @@ fn main() {
     initial_final(&mut robot,"Position initial".to_string());
     game(terrain.x,terrain.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
-    
-    
-
-        
+   
 }
 
 
