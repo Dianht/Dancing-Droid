@@ -1,5 +1,7 @@
 use colored::*; //gadjet il faudra modifier le cargo.toml
 use std::fmt; // On importe le module `fmt`
+use std::fs::File;
+use std::io::prelude::*;
 
 #[derive(Debug)]
 enum Orientation {
@@ -27,10 +29,65 @@ struct Terrain {
     x : i32,
     y : i32,
 }
+fn file(mut robot :&mut Vec<Robot>) -> Terrain{
+                                //Projet/DancingDroids/two_robots.txt
+    let mut file = File::open("/media/dinathsh/DinaStockage/Université/Licence 2/Programmation Avancé/Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
+    let mut s = String::new();
+    file.read_to_string(&mut s).expect("Impossible de lire le fichier");
+    let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
+    
+    let mut m : Vec<&str> = Vec::new();
+    let mut id : i32 = 0;
 
+    let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
+
+    for i in 3..c.len(){
+        m.push(c[i]);
+        if c[i] == "" {
+            create_robot(&mut robot,m.clone(),id);
+            id += 1;
+            m.clear();
+        }
+        
+    }
+    return terrain;
+}
+fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32) {
+    let mut robot_instruction : Vec<&Instruction> = Vec::new();
+    let mut position : Vec<i32> = Vec::new();
+    let mut orientation : Orientation = Orientation::North;
+
+    for i in 0..c.len(){
+        match c[i] {
+            "N" => orientation = Orientation::North,
+            "E" => orientation = Orientation::Est,
+            "W" => orientation = Orientation::West,
+            "S" => orientation = Orientation::South,
+            "" =>   {
+                        let instruction : Vec<char> = c[i - 1].chars().collect();
+                        for i in 0..instruction.len() {
+                            match instruction[i] {
+                                'F' => robot_instruction.push(&Instruction::F),
+                                'R' => robot_instruction.push(&Instruction::R),
+                                'L' => robot_instruction.push(&Instruction::L),
+                                _ => (),
+                            } 
+                        }
+                        let y = position[0];
+                        let x = position[1];
+                        robot.push(Robot{id : id,x : x, y : y,orientation : orientation,instruction : robot_instruction, });
+                        break;
+                    }
+            _ => match c[i].parse::<i32>() {
+                Err(_) => (),
+                _ => position.push(c[i].parse::<i32>().unwrap())
+            }
+        } 
+    }
+}
+    
 
 fn initial_final(robot :&mut Vec<Robot>,position : String){  
-    println!("\n");
     for i in 0..robot.len(){
         println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".blue(),robot[i].id,robot[i].x,robot[i].y);
     }
@@ -114,7 +171,7 @@ fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
         }
     }
 }   
-fn display(robot : Vec<Robot>,terrain : Terrain){
+fn display(robot :&mut Vec<Robot>,terrain :&mut Terrain){
     println!("Terrain {{ {} }}",terrain);
 
     println!("Robots {{");
@@ -138,28 +195,12 @@ impl <'a> fmt::Display for Robot<'a> {
 }
 fn main() {
 
-    let f = &Instruction::F;
-    let r = &Instruction::R;
-    let l = &Instruction::L;
-    let terrain = Terrain {x : 5,y : 8};
-    
     let mut robot = Vec::new();
-
-    // Faire une boucle jusqu'a qu'il y a plus d'instruction dans le fichier
-    let rb = Robot{ id: 0,x: 1,y: 1,orientation: Orientation::North, instruction : vec![l,f,f,f,f,f]};
-    robot.push(rb);
-    let rb = Robot{ id: 1,x: 1,y: 2,orientation: Orientation::South,instruction : vec![f,f,l,f,r,r,f]};
-    robot.push(rb);
-    let rb = Robot{ id: 2,x: 4,y: 1,orientation: Orientation::West,instruction : vec![f,r,r,f,l,f,f,f,l,r]};
-    robot.push(rb);
-    let rb = Robot{ id: 3,x: 1,y: 0,orientation: Orientation::West,instruction : vec![f,l,f,f,r,r,r,f,l,f]};
-    robot.push(rb);
-    //push chaque robot dans le vecteur
-
+    let mut terrain = file(&mut robot);
+    display(&mut robot,&mut terrain);
     initial_final(&mut robot,"Position initial".to_string());
     game(terrain.x,terrain.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
-    display(robot,terrain);
     
     
 
