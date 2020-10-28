@@ -1,177 +1,215 @@
-//A FAIRE : crée des fonctions, faire marcher le programme à partir de fichier d'instrucions
+use colored::*; //gadjet il faudra modifier le cargo.toml
+use std::fmt; // On importe le module `fmt`
+use std::fs::File;
+use std::io::prelude::*;
 
-
-struct Robot<'a>  {
-    id: String,
-    orientation : String,
-    instructions : Vec<&'a str>,
-    x: i16,
-    y: i16,
+#[derive(Debug)]
+enum Orientation {
+    North,
+    West,
+    South,
+    Est,
+}
+#[derive(Debug)]
+enum Instruction {
+    F,
+    L,
+    R,
+}
+#[derive(Debug)]
+struct Robot<'a> {
+    id: i32,
+    x: i32,
+    y: i32,
+    orientation : Orientation,
+    instruction : Vec<&'a Instruction>,
 }
 
-
-
-fn main() {
-
+struct Terrain {
+    x : i32,
+    y : i32,
+}
+fn file(mut robot :&mut Vec<Robot>) -> Terrain{
+                                //Projet/DancingDroids/two_robots.txt
+    let mut file = File::open("/media/dinathsh/DinaStockage/Université/Licence 2/Programmation Avancé/Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
+    let mut s = String::new();
+    file.read_to_string(&mut s).expect("Impossible de lire le fichier");
+    let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
     
-    let limite_x : i16 = 3;
-    let limite_y : i16 = 3;
-    
-    
-    let mut vecteur = vec![Robot{ id: "Blitz".to_string(), orientation: "North".to_string(),instructions: ["F","F","F","F"].to_vec(),x: 1,y: 1 },
-                             Robot{ id: "Dinabot".to_string(), orientation: "North".to_string(),instructions: ["F","F","F"].to_vec(),x: 2,y: 2}];
+    let mut m : Vec<&str> = Vec::new();
+    let mut id : i32 = 0;
 
-    let (rb1,rb2) = vecteur.split_at_mut(1);    //Si on fait directement rb1 = &mut robot1[0]et rb = &mut robot2[1]
-    let mut robot1 = &mut rb1[0];
-    let mut robot2 = &mut rb2[0];
+    let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
 
-    let taille = if robot1.instructions.len() > robot2.instructions.len(){              //On prend la plus grande taille des deux vecteurs
-                        robot1.instructions.len()}
-                else {
-                    robot2.instructions.len()
-                };
-
-    println!("Robot<{}> // position initial x : {} y : {}, orientation : {}, instruction{:?}",robot1.id,robot1.x,robot1.y,robot1.orientation,robot1.instructions);
-    println!("Robot<{}> // position initial x : {} y : {}, orientation : {}, instruction{:?}",robot2.id,robot2.x,robot2.y,robot2.orientation,robot2.instructions);
-
-    
-
-
-    for i in 0..taille {
-        if i != robot1.instructions.len(){          //Parce que si i est superieur à la taille d'un des deux tableaux, le programme s'arrete du coup on arrete seulement un des dexu match
-            match robot1.instructions[i]{
-                "F" => {
-                    if robot1.orientation == "North"{
-                        if robot1.x == robot2.x && robot1.y + 1 == robot2.y || robot1.y + 1 == limite_y {
-                            println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                        }else {
-                            robot1.y = robot1.y + 1;
-                        }
-                    }
-                    else if robot1.orientation == "West"{
-                        if robot1.x - 1 == robot2.x && robot1.y == robot2.y || robot1.x - 1 == limite_x {
-                            println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                        } else {
-                            robot1.x = robot1.x - 1;
-                        }
-                    }
-                    else if robot1.orientation == "Est"{
-                        if robot1.x + 1 == robot2.x && robot1.y == robot2.y || robot1.x + 1 == limite_x {
-                            println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                        } else {
-                            robot1.x = robot1.x + 1;
-                        }
-                    }   
-                    else if robot1.orientation == "South"{
-                        if robot1.x == robot2.x && robot1.y - 1 == robot2.y || robot1.y - 1 == limite_y{
-                            println!("Collision ! du Robot<{}> aux coordonnées x:{}, y:{}",robot1.id,robot1.x,robot1.y);
-                        } else {
-                            robot1.y = robot1.y - 1;
-                        }
-                    }
-                }
-                "L" => {
-                    if robot1.orientation == "North"{
-                        robot1.orientation = "West".to_string();
-                    }
-                    else if robot1.orientation == "West"{
-                        robot1.orientation = "South".to_string();
-                    }
-                    else if robot1.orientation == "Est"{
-                        robot1.orientation = "North".to_string();
-                    }
-                    else if robot1.orientation == "South"{
-                        robot1.orientation = "Est".to_string();
-                    }
-                
-                }
-                "R" => {
-                    if robot1.orientation == "North"{
-                        robot1.orientation = "Est".to_string();
-                    }
-                    else if robot1.orientation == "West"{
-                        robot1.orientation = "North".to_string();
-                    }
-                    else if robot1.orientation == "Est"{
-                        robot1.orientation = "South".to_string();
-                    }
-                    else if robot1.orientation == "South"{
-                        robot1.orientation = "West".to_string();
-                    }
-                    }
-                _ => println!("Je reconnais pas votre lettre"),
-            }
-        }
-        if i != robot2.instructions.len(){
-            match robot2.instructions[i]{
-                "F" => {
-                    if robot2.orientation == "North"{
-                        if robot2.x == robot1.x && robot2.y + 1 == robot1.y || robot2.y + 1 == limite_y {
-                            println!("Collision ! du Robot <{}> aux  coordonnées x:{}, y:{}",robot2.id,robot2.x,robot2.y);
-                        }else {
-                            robot2.y = robot2.y + 1;
-                        }
-                    }
-                    else if robot2.orientation == "West"{
-                        if robot2.x - 1 == robot1.x && robot2.y == robot1.y || robot2.x - 1 == limite_x {
-                            println!("Collision ! du Robot <{}> aux  coordonnées x:{}, y:{}",robot2.id,robot2.x,robot2.y);
-                        } else {
-                            robot2.x = robot2.x - 1;
-                        }
-                    }
-                    else if robot2.orientation == "Est"{
-                        if robot2.x + 1 == robot1.x && robot2.y == robot1.y || robot2.x + 1 == limite_x {
-                            println!("Collision ! du Robot <{}> aux  coordonnées x:{}, y:{}",robot2.id,robot2.x,robot2.y);
-                        } else {
-                            robot2.x = robot2.x + 1;
-                        }
-                    }   
-                    else if robot2.orientation == "South"{
-                        if robot2.x == robot1.x && robot2.y - 1 == robot1.y || robot2.y - 1 == limite_y {
-                            println!("Collision ! du Robot <{}> aux  coordonnées x:{}, y:{}",robot2.id,robot2.x,robot2.y);
-                        } else {
-                            robot2.y = robot2.y - 1;
-                        }
-                    }
-                }
-                "L" => {
-                    if robot2.orientation == "North"{
-                        robot2.orientation = "West".to_string();
-                    }
-                    else if robot2.orientation == "West"{
-                        robot1.orientation = "South".to_string();
-                    }
-                    else if robot2.orientation == "Est"{
-                        robot2.orientation = "North".to_string();
-                    }
-                    else if robot2.orientation == "South"{
-                        robot2.orientation = "Est".to_string();
-                    }
-                
-                }
-                "R" => {
-                    if robot2.orientation == "North"{
-                        robot2.orientation = "Est".to_string();
-                    }
-                    else if robot2.orientation == "West"{
-                        robot2.orientation = "North".to_string();
-                    }
-                    else if robot2.orientation == "Est"{
-                        robot2.orientation = "South".to_string();
-                    }
-                    else if robot2.orientation == "South"{
-                        robot2.orientation = "West".to_string();
-                    }
-                    }
-                _ => println!("Je reconnais pas votre lettre"),
-            }
+    for i in 3..c.len(){
+        m.push(c[i]);
+        if c[i] == "" {
+            create_robot(&mut robot,m.clone(),id);
+            id += 1;
+            m.clear();
         }
         
     }
+    return terrain;
+}
+fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32) {
+    let mut robot_instruction : Vec<&Instruction> = Vec::new();
+    let mut position : Vec<i32> = Vec::new();
+    let mut orientation : Orientation = Orientation::North;
 
-    println!("position du Robot<{}> final x : {} y : {}",robot1.id,robot1.x,robot1.y);
-    println!("position du Robot<{}> final x : {} y : {}",robot2.id,robot2.x,robot2.y);
+    for i in 0..c.len(){
+        match c[i] {
+            "N" => orientation = Orientation::North,
+            "E" => orientation = Orientation::Est,
+            "W" => orientation = Orientation::West,
+            "S" => orientation = Orientation::South,
+            "" =>   {
+                        let instruction : Vec<char> = c[i - 1].chars().collect();
+                        for i in 0..instruction.len() {
+                            match instruction[i] {
+                                'F' => robot_instruction.push(&Instruction::F),
+                                'R' => robot_instruction.push(&Instruction::R),
+                                'L' => robot_instruction.push(&Instruction::L),
+                                _ => (),
+                            } 
+                        }
+                        let y = position[0];
+                        let x = position[1];
+                        robot.push(Robot{id : id,x : x, y : y,orientation : orientation,instruction : robot_instruction, });
+                        break;
+                    }
+            _ => match c[i].parse::<i32>() {
+                Err(_) => (),
+                _ => position.push(c[i].parse::<i32>().unwrap())
+            }
+        } 
+    }
+}
+    
+
+fn initial_final(robot :&mut Vec<Robot>,position : String){  
+    for i in 0..robot.len(){
+        println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".blue(),robot[i].id,robot[i].x,robot[i].y);
+    }
+    println!("\n");
+}
+
+fn game(lim_x : i32,lim_y : i32,mut robot :&mut Vec<Robot>){
+    
+    //On trouve le grand nombre d'instruction qu'a un robots
+    let mut taille = robot[0].instruction.len();
+    for i in 0..robot.len() - 1{
+        if taille > robot[i + 1].instruction.len(){
+            taille = robot[i].instruction.len();
+        }
+        else {
+            taille = robot[i + 1].instruction.len()
+        }
+    }
+    // Nous permetra de stocker les valeurs des coordonées du robot avant l'instruction
+    let mut tmp :(i32,i32);
+    //Une boucle jusqu'à que le robot avec le + d'instruction n'aura plus d'instruction
+    for x in 0..taille{       
+                              
+        for i in 0..robot.len(){              //Une boucle qui fera jouer les robots un par un
+            if x < robot[i].instruction.len() {           //On ignorera les Robot qui n'ont plus d'instruction
+                tmp = (robot[i].x,robot[i].y);
+                instruction(robot[i].instruction[x],& mut robot[i]);                               
+                collision(tmp.0,tmp.1,&mut robot, lim_y,lim_x,i);  
+            }  
+        }
+    }
+}
+
+fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
+
+    for i in 0..robot.len(){
+
+        if robot[m].x == robot[i].x && robot[m].y == robot[i].y{
+            if robot[m].id != robot[i].id{     //hehe
+                println!("{} 💥\n{}<{}> fonce vers {}<{}> aux coordonnée x : {} y : {} !","Collision !".red(),"Le Robot".cyan(),robot[m].id,"le Robot".green(),robot[i].id,robot[m].x,robot[m].y);
+                robot[m].x = tmp_x;
+                robot[m].y = tmp_y;
+            }
+        }
+
+        else if robot[m].x == lim_x + 1 || robot[m].x < 0 || robot[m].y == lim_y + 1|| robot[m].y < 0{
+            if robot[m].id != robot[i].id{ 
+                println!("{} 🚧\n{}<{}> se dirige vers les limites de la map !","Attention !".red(),"Le Robot".yellow(),robot[m].id);
+                robot[m].x = tmp_x;
+                robot[m].y = tmp_y;
+            }
+        }  
+    }
+}
+
+fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
+    match instruction_robot{
+        Instruction::F => {
+            match robot.orientation{
+                Orientation::North => robot.y = robot.y + 1,
+                Orientation::West => robot.x = robot.x - 1,
+                Orientation::Est => robot.x = robot.x + 1,
+                Orientation::South => robot.y = robot.y - 1,
+            }
+        }
+        Instruction::L => {
+            match robot.orientation{
+                Orientation::North  => robot.orientation =  Orientation::West,
+                Orientation::West => robot.orientation = Orientation::South,
+                Orientation::Est => robot.orientation = Orientation::North,
+                Orientation::South => robot.orientation = Orientation::Est,
+            }
+        }
+        Instruction::R => {
+            match robot.orientation {
+                Orientation::North => robot.orientation =  Orientation::Est,
+                Orientation::West => robot.orientation = Orientation::North,
+                Orientation::Est => robot.orientation = Orientation::South,
+                Orientation::South => robot.orientation = Orientation::West,
+            }
+        }
+    }
+}   
+fn display(robot :&mut Vec<Robot>,terrain :&mut Terrain){
+    println!("Terrain {{ {} }}",terrain);
+
+    println!("Robots {{");
+    for i in 0..robot.len(){
+        println!("  {{ {}, }}",robot[i]);
+    }
+    println!("}}");
+}
+
+impl fmt::Display for Terrain {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "x_max = {}, y_max = {}", self.x, self.y)
+    }
+}
+
+impl <'a> fmt::Display for Robot<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
+    }
+}
+fn main() {
+
+    let mut robot = Vec::new();
+    let mut terrain = file(&mut robot);
+    display(&mut robot,&mut terrain);
+    initial_final(&mut robot,"Position initial".to_string());
+    game(terrain.x,terrain.y,&mut robot);
+    initial_final(&mut robot,"Position finale".to_string());
+    
+    
 
         
 }
-    
+
+
+
+
+
+
+
