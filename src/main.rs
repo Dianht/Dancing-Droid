@@ -1,7 +1,9 @@
-use colored::*; //gadjet il faudra modifier le cargo.toml
+use colored::*;//gadjet il faudra modifier le cargo.toml
 use std::fmt; // On importe le module `fmt`
 use std::fs::File;
 use std::io::prelude::*;
+use rand::Rng;
+
 
 #[derive(Debug)]
 enum Orientation {
@@ -10,6 +12,7 @@ enum Orientation {
     South,
     Est,
 }
+
 #[derive(Debug)]
 enum Instruction {
     F,
@@ -31,7 +34,7 @@ struct Terrain {
 }
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
                                 //Projet/DancingDroids/two_robots.txt
-    let mut file = File::open("Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
+    let mut file = File::open("/media/dinathsh/DinaStockage/Université/Licence 2/Programmation Avancé/Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
     let mut s = String::new();
     file.read_to_string(&mut s).expect("Impossible de lire le fichier");
     let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
@@ -42,57 +45,92 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
     let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
 
     for i in 3..c.len(){
-        m.push(c[i]);
         if c[i] == "" {
-            create_robot(&mut robot,m.clone(),id);
-            id += 1;
-            m.clear();
+            if m.len() == 4{
+                create_robot(&mut robot,m.clone(),id,'N');
+                id += 1;
+                m.clear();
+            }
+            else if m.len() == 3{
+                m.push(c[i]);
+                create_robot(&mut robot,m.clone(),id,'O');
+                id += 1;
+                m.clear();
+            }
+            else {break;}
         }
-        
+        else {m.push(c[i]);}
     }
+
     return terrain;
 }
 
-fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32) {
+fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32,vide : char) {
+    
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
     let mut position : Vec<i32> = Vec::new();
     let mut orientation : Orientation = Orientation::North;
-
-    for i in 0..c.len(){
-        match c[i] {
+    
+    for i in 0..2{
+        match c[i].parse::<i32>() {
+            Err(_) => (),
+            _ => position.push(c[i].parse::<i32>().unwrap()),
+        }
+    }
+    match c[2]{
             "N" => orientation = Orientation::North,
             "E" => orientation = Orientation::Est,
             "W" => orientation = Orientation::West,
             "S" => orientation = Orientation::South,
-            "" =>   {
-                        let instruction : Vec<char> = c[i - 1].chars().collect();
-                        for i in 0..instruction.len() {
-                            match instruction[i] {
-                                'F' => robot_instruction.push(&Instruction::F),
-                                'R' => robot_instruction.push(&Instruction::R),
-                                'L' => robot_instruction.push(&Instruction::L),
-                                _ => (),
-                            } 
-                        }
-                        let y = position[0];
-                        let x = position[1];
-                        robot.push(Robot{id : id,x : x, y : y,orientation : orientation,instruction : robot_instruction, });
-                        break;
-                    }
-            _ => match c[i].parse::<i32>() {
-                Err(_) => (),
-                _ => position.push(c[i].parse::<i32>().unwrap())
-            }
-        } 
+            _ => println!("C'est une Orientation ???? {}",c[2]),
+            
     }
-}
+    if vide == 'N'{
+        let instruction : Vec<char> = c[3].chars().collect();
+        for i in 0..instruction.len() {
+            match instruction[i] {
+                'F' => robot_instruction.push(&Instruction::F),
+                'R' => robot_instruction.push(&Instruction::R),
+                'L' => robot_instruction.push(&Instruction::L),
+                _ => {
+                    println!("C'est une instruction ???? {} ",instruction[i]);
+                    break;
+                },
+            } 
+        }
+    }
+    else if vide == 'O' {
+        let mut i : usize = 0;
+        let mut rng= rand::thread_rng();
+        let nbre_instruction = rng.gen_range(1, 10);
+        while i != nbre_instruction {
+            let aleatoire = rng.gen_range(0, 3);
+            match aleatoire{
+
+                0 => robot_instruction.push(&Instruction::F),
+                1 => robot_instruction.push(&Instruction::R),
+                2 => robot_instruction.push(&Instruction::L),
+                _ => (),
+                
+            }
+            i += 1;
+        }
+    }
     
+    let y = position[0];
+    let x = position[1];
+    robot.push(Robot{id : id,x : x, y : y,orientation : orientation,instruction : robot_instruction, });
+    
+   
+}
 
 fn initial_final(robot :&mut Vec<Robot>,position : String){  
+    
     for i in 0..robot.len(){
         println!("{} du {}<{}>  x : {} y : {}",position.magenta(),"Robot".blue(),robot[i].id,robot[i].x,robot[i].y);
     }
     println!("\n");
+    
 }
 
 fn game(lim_x : i32,lim_y : i32,mut robot :&mut Vec<Robot>){
@@ -127,7 +165,7 @@ fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i3
     for i in 0..robot.len(){
 
         if robot[m].x == robot[i].x && robot[m].y == robot[i].y{
-            if robot[m].id != robot[i].id{     //hehe
+            if robot[m].id != robot[i].id{     
                 println!("{} 💥\n{}<{}> fonce vers {}<{}> aux coordonnée x : {} y : {} !","Collision !".red(),"Le Robot".cyan(),robot[m].id,"le Robot".green(),robot[i].id,robot[m].x,robot[m].y);
                 robot[m].x = tmp_x;
                 robot[m].y = tmp_y;
@@ -193,6 +231,7 @@ impl <'a> fmt::Display for Robot<'a> {
         write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
     }
 }
+
 fn main() {
 
     let mut robot = Vec::new();
@@ -201,12 +240,7 @@ fn main() {
     initial_final(&mut robot,"Position initial".to_string());
     game(terrain.x,terrain.y,&mut robot);
     initial_final(&mut robot,"Position finale".to_string());
-   
+
 }
-
-
-
-
-
 
 
