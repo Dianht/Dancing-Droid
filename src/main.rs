@@ -34,7 +34,7 @@ struct Terrain {
 }
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
                                 //Projet/DancingDroids/two_robots.txt
-    let mut file = File::open("two_robots.txt").expect("Impossible de lire le fichier");
+    let mut file = File::open("../two_robots.txt").expect("Impossible de lire le fichier");
     let mut s = String::new();
     file.read_to_string(&mut s).expect("Impossible de lire le fichier");
     let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
