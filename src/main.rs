@@ -3,7 +3,7 @@ use std::fmt; // On importe le module `fmt`
 use std::fs::File;
 use std::io::prelude::*;
 use rand::Rng;
-
+use std::io;
 
 #[derive(Debug)]
 enum Orientation {
@@ -27,14 +27,65 @@ struct Robot<'a> {
     orientation : Orientation,
     instruction : Vec<&'a Instruction>,
 }
-
+#[derive(Debug)]
 struct Terrain {
     x : i32,
     y : i32,
 }
+
+fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
+    
+    let mut rng= rand::thread_rng();
+    let mut orientation : Orientation = Orientation::North;
+    let mut robot_instruction : Vec<&Instruction> = Vec::new();
+
+    let x = rng.gen_range(1, terrain.x);
+    let y = rng.gen_range(1, terrain.y);
+    let nbre_instruction = rng.gen_range(1, 10);
+    let mut i = 0;
+
+    let aleatoire = rng.gen_range(0, 4);
+        match aleatoire{
+            0 => orientation = Orientation::North,
+            1 => orientation = Orientation::West,
+            2 => orientation = Orientation::Est,
+            3 => orientation = Orientation::South,
+            _ => (),
+            
+        }
+    while i != nbre_instruction {
+        let aleatoire = rng.gen_range(0, 3);
+        match aleatoire{
+            0 => robot_instruction.push(&Instruction::F),
+            1 => robot_instruction.push(&Instruction::R),
+            2 => robot_instruction.push(&Instruction::L),
+            _ => (),
+            
+        }
+        i += 1;
+    }
+    robot.push(Robot{id : id,x : x, y : y,orientation : orientation,instruction : robot_instruction, });
+}
+fn random_world(mut robot : &mut Vec<Robot>) -> Terrain {
+    let mut rng= rand::thread_rng();
+    let mut terrain = Terrain {x : rng.gen_range(1, 20) ,y : rng.gen_range(1, 20) };
+
+    let nbre_robots = rng.gen_range(1, 10);
+
+    let mut p = 0;
+
+    while p != nbre_robots{
+        random_robot(&mut robot,&mut terrain,p);
+        p += 1;
+    }
+
+    return terrain;
+
+}
+
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
-                                //Projet/DancingDroids/two_robots.txt
-    let mut file = File::open("/media/dinathsh/DinaStockage/Université/Licence 2/Programmation Avancé/Projet/DancingDroids/two_robots.txt").expect("Impossible de lire le fichier");
+
+    let mut file = File::open("../two_robots.txt").expect("Impossible de lire le fichier");
     let mut s = String::new();
     file.read_to_string(&mut s).expect("Impossible de lire le fichier");
     let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
@@ -235,11 +286,43 @@ impl <'a> fmt::Display for Robot<'a> {
 fn main() {
 
     let mut robot = Vec::new();
-    let mut terrain = file(&mut robot);
-    display(&mut robot,&mut terrain);
-    initial_final(&mut robot,"Position initial".to_string());
-    game(terrain.x,terrain.y,&mut robot);
-    initial_final(&mut robot,"Position finale".to_string());
+    let mut terrain;
+
+    println!("\nVoulez-vous génerer un monde aléatoire ?\nY/N ?");
+    loop {
+    let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(_) => {  
+                match input.as_str().trim() {
+                    "Y" => {    
+                            println!("Dac'\n{}","Generation du monde aléatoire en cours 🌍 ...".green());
+                            terrain = random_world(&mut robot);
+                            break;
+                    }
+                    "N" => {
+                            println!("Dac'\n{}","Generation du monde en cours 🌍 ...".green());
+                            terrain = file(&mut robot);
+                            break;
+
+                    }
+                    _=> println!("Y/N ?"),
+                } 
+            }
+            Err(error) => println!("????: {}", error),
+        }
+    }
+   
+
+
+    //Si le robot est vide, on ne lance pas le programme
+    if robot.len() != 0 {
+        display(&mut robot,&mut terrain);
+        initial_final(&mut robot,"Position initial".to_string());
+        game(terrain.x,terrain.y,&mut robot);
+        initial_final(&mut robot,"Position finale".to_string());
+    }
+  
+
 
 }
 
