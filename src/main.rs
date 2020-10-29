@@ -33,7 +33,7 @@ struct Terrain {
     y : i32,
 }
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
-                                //Projet/DancingDroids/two_robots.txt
+
     let mut file = File::open("../two_robots.txt").expect("Impossible de lire le fichier");
     let mut s = String::new();
     file.read_to_string(&mut s).expect("Impossible de lire le fichier");
@@ -44,15 +44,19 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
 
     let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
 
+    //on  considere que à partir de c[3] on a les robots
     for i in 3..c.len(){
-        if c[i] == "" {
-            if m.len() == 4{
+        //lorsque que que c[i] == "" on considere qu'on passe à un autre robot
+        if c[i] == "" {         
+            if m.len() == 4{            //Un robot doit recevoir 4 String (x,y,orientation,instruction)
                 create_robot(&mut robot,m.clone(),id,'N');
-                id += 1;
+                id += 1;    
                 m.clear();
             }
-            else if m.len() == 3{
+            //Si le vecteur n'a reçu que 3 string (x,y,orientation),cela signifie qu'il n'a pas reçu d'instruction
+            else if m.len() == 3{   
                 m.push(c[i]);
+                //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
                 create_robot(&mut robot,m.clone(),id,'O');
                 id += 1;
                 m.clear();
