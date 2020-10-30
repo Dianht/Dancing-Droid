@@ -1,8 +1,9 @@
 use colored::*;//Gadjet mais ça rajoute des couleurs ajouter colored = "2" dans Cargo.toml
 use std::fmt; // On importe le module `fmt`
 use std::fs::File;
-use std::io::prelude::*;
 use rand::Rng;  //Pour générer des nombres aléatoires(ajouter rand = "0.7" dans Cargo.toml)
+use std::path::Path;
+use std::io::prelude::*;
 
 use std::io;
 
@@ -42,12 +43,12 @@ fn choice(mut robot : &mut Vec<Robot>) -> Terrain{
                 Ok(_) => {  
                     match input.as_str().trim() {          //.trim() pour enlever les \n
                         "Y" => {    
-                                println!("Dac'\n{}","Generation du monde aléatoire en cours 🌍 ...".green());
+                                println!("\n{}","Generation du monde aléatoire en cours 🌍 ...".green());
                                 terrain = random_world(&mut robot);
                                 return terrain;
                         }
                         "N" => {
-                                println!("Dac'\n{}","Generation du monde en cours 🌍 ...".green());
+                                println!("\n{}","Generation du monde en cours 🌍 ...".green());
                                 terrain = file(&mut robot);
                                 return terrain;
     
@@ -111,22 +112,45 @@ fn random_world(mut robot : &mut Vec<Robot>) -> Terrain {
 
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
 
-    let mut file = File::open("../two_robots.txt").expect("Impossible de lire le fichier");
+
+    let path = Path::new("../two_robots.txt");
+    let display = path.display();
+
+    let mut file = match File::open(&path) {
+        Err(why) => panic!("Impossible d'ouvrir {}: {}", display, why),
+        Ok(file) => file,
+    };
+
     let mut s = String::new();
-    file.read_to_string(&mut s).expect("Impossible de lire le fichier");
+    match file.read_to_string(&mut s) {
+        Ok(_) => (),
+        Err(why) => panic!("Impossible de lire {}: {}", display, why), 
+    }
     let c : Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
     
     let mut m : Vec<&str> = Vec::new();
     let mut id : i32 = 0;
+    
+    let mut terrain = Terrain {x : 0,y : 0,};
 
-    let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
+    let _number = match c[0].parse::<i32>() {
+        Ok(number) => terrain.x = number,
+        Err(_) => (),
+    };
+    let _number = match c[1].parse::<i32>() {
+        Ok(number) => terrain.y = number,
+        Err(_) => (),
+    };
+
+
+    
     //on  considere que à partir de c[3] on a les robots
     for i in 3..c.len(){
     //lorsque que que c[i] == "" on considere qu'on passe à un autre robot
         if c[i] == "" {
     //Un robot doit recevoir 4 String (x,y,orientation,instruction)
             if m.len() == 4{
-                create_robot(&mut robot,m.clone(),id,'N');
+                create_robot(&mut robot,&mut m,id,'N');
                 id += 1;
                 m.clear();
             }
@@ -135,7 +159,7 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
                 m.push(c[i]);
                 println!("Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
     //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
-                create_robot(&mut robot,m.clone(),id,'O');
+                create_robot(&mut robot,&mut m,id,'O');
                 id += 1;
                 m.clear();
             }
@@ -147,17 +171,17 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
     return terrain;
 }
 
-fn create_robot(robot :&mut Vec<Robot>, c : Vec<&str>,id : i32,vide : char) {
+fn create_robot(robot :&mut Vec<Robot>, c :&mut Vec<&str>,id : i32,vide : char) {
     
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
     let mut position : Vec<i32> = Vec::new();
     let mut orientation : Orientation = Orientation::North;
     
     for i in 0..2{
-        match c[i].parse::<i32>() {
+        let _number = match c[i].parse::<i32>() {
+            Ok(number) => position.push(number),
             Err(_) => (),
-            _ => position.push(c[i].parse::<i32>().unwrap()),
-        }
+        };
     }
     match c[2]{
             "N" => orientation = Orientation::North,
@@ -318,7 +342,7 @@ fn main() {
 
     let mut robot = Vec::new();
 
-    println!("\nVoulez-vous génerer un monde aléatoire ?\nY/N ?");
+    println!("\nVoulez-vous génerer un monde aléatoire ?\n{}/{} ?","Y".green(),"N".red());
     let mut terrain : Terrain = choice(&mut robot);
 
     //Si le robot est vide, on ne lance pas le programme
