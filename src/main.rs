@@ -66,7 +66,7 @@ fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
     let mut orientation : Orientation = Orientation::North;
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
 
-    let x = rng.gen_range(0, terrain.x);
+    let x = rng.gen_range(0, terrain.x);    
     let y = rng.gen_range(0, terrain.y);
     let nbre_instruction = rng.gen_range(1, 10);
     let mut i = 0;
@@ -77,7 +77,7 @@ fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
             1 => orientation = Orientation::West,
             2 => orientation = Orientation::Est,
             3 => orientation = Orientation::South,
-            _ => println!("oh"),
+            _ => (),
             
         }
     while i != nbre_instruction {
@@ -86,7 +86,7 @@ fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
             0 => robot_instruction.push(&Instruction::F),
             1 => robot_instruction.push(&Instruction::R),
             2 => robot_instruction.push(&Instruction::L),
-            _ => println!("ah"),
+            _ => (),
             
         }
         i += 1;
@@ -109,7 +109,6 @@ fn random_world(mut robot : &mut Vec<Robot>) -> Terrain {
     return terrain;
 
 }
-
 fn file(mut robot :&mut Vec<Robot>) -> Terrain{
 
 
@@ -157,7 +156,7 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
     //Si le vecteur n'a reçu que 3 string (x,y,orientation),cela signifie qu'il n'a pas reçu d'instruction
             else if m.len() == 3{
                 m.push(c[i]);
-                println!("Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
+                println!("🚨 Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
     //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
                 create_robot(&mut robot,&mut m,id,'O');
                 id += 1;
@@ -170,12 +169,11 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
 
     return terrain;
 }
-
 fn create_robot(robot :&mut Vec<Robot>, c :&mut Vec<&str>,id : i32,vide : char) {
     
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
     let mut position : Vec<i32> = Vec::new();
-    let mut orientation : Orientation = Orientation::North;
+    let mut orientation : Orientation = Orientation::North; //Faut trouver un autre moyen pour l'initialiser
     
     for i in 0..2{
         let _number = match c[i].parse::<i32>() {
@@ -229,7 +227,6 @@ fn create_robot(robot :&mut Vec<Robot>, c :&mut Vec<&str>,id : i32,vide : char) 
     
    
 }
-
 fn initial_final(robot :&mut Vec<Robot>,position : String){  
     
     for i in 0..robot.len(){
@@ -238,7 +235,6 @@ fn initial_final(robot :&mut Vec<Robot>,position : String){
     println!("\n");
     
 }
-
 fn game(lim_x : i32,lim_y : i32,mut robot :&mut Vec<Robot>){
     
     //On trouve le grand nombre d'instruction qu'a un robots
@@ -265,7 +261,6 @@ fn game(lim_x : i32,lim_y : i32,mut robot :&mut Vec<Robot>){
         }
     }
 }
-
 fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i32,m : usize){
 
     for i in 0..robot.len(){
@@ -287,7 +282,6 @@ fn collision(tmp_x : i32,tmp_y :i32,robot :&mut Vec<Robot>,lim_y : i32,lim_x :i3
         }  
     }
 }
-
 fn instruction(instruction_robot : &Instruction,robot :&mut Robot){
     match instruction_robot{
         Instruction::F => {
@@ -325,13 +319,11 @@ fn display(robot :&mut Vec<Robot>,terrain :&mut Terrain){
     }
     println!("}}");
 }
-
 impl fmt::Display for Terrain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "x_max = {}, y_max = {}", self.x, self.y)
     }
 }
-
 impl <'a> fmt::Display for Robot<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "id = {}, x = {}; y = {}, orientation = {:?}, instruction = {:?}", self.id, self.x,self.y,self.orientation,self.instruction)
@@ -342,6 +334,7 @@ fn main() {
 
     let mut robot = Vec::new();
 
+    print!("🤖 {} Dancing Droid 0.3.1 {} 🦾","......".cyan(),"......".cyan());
     println!("\nVoulez-vous génerer un monde aléatoire ?\n{}/{} ?","Y".green(),"N".red());
     let mut terrain : Terrain = choice(&mut robot);
 
