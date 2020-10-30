@@ -1,8 +1,9 @@
-use colored::*;//gadjet il faudra modifier le cargo.toml
+use colored::*;//Gadjet mais ça rajoute des couleurs ajouter colored = "2" dans Cargo.toml
 use std::fmt; // On importe le module `fmt`
 use std::fs::File;
 use std::io::prelude::*;
-use rand::Rng;
+use rand::Rng;  //Pour générer des nombres aléatoires(ajouter rand = "0.7" dans Cargo.toml)
+
 use std::io;
 
 #[derive(Debug)]
@@ -32,15 +33,40 @@ struct Terrain {
     x : i32,
     y : i32,
 }
-
+fn choice(mut robot : &mut Vec<Robot>) -> Terrain{
+    let terrain;
+    //Tant que l'utilisateur n'aura pas entré une réponse valide, on fera une boucle
+    loop {
+        let mut input = String::new();
+            match io::stdin().read_line(&mut input) {
+                Ok(_) => {  
+                    match input.as_str().trim() {          //.trim() pour enlever les \n
+                        "Y" => {    
+                                println!("Dac'\n{}","Generation du monde aléatoire en cours 🌍 ...".green());
+                                terrain = random_world(&mut robot);
+                                return terrain;
+                        }
+                        "N" => {
+                                println!("Dac'\n{}","Generation du monde en cours 🌍 ...".green());
+                                terrain = file(&mut robot);
+                                return terrain;
+    
+                        }
+                        _=> println!("Y/N ?"),
+                    } 
+                }
+                Err(error) => println!("????: {}", error),
+            }
+        }
+}
 fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
     
     let mut rng= rand::thread_rng();
     let mut orientation : Orientation = Orientation::North;
     let mut robot_instruction : Vec<&Instruction> = Vec::new();
 
-    let x = rng.gen_range(1, terrain.x);
-    let y = rng.gen_range(1, terrain.y);
+    let x = rng.gen_range(0, terrain.x);
+    let y = rng.gen_range(0, terrain.y);
     let nbre_instruction = rng.gen_range(1, 10);
     let mut i = 0;
 
@@ -50,7 +76,7 @@ fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
             1 => orientation = Orientation::West,
             2 => orientation = Orientation::Est,
             3 => orientation = Orientation::South,
-            _ => (),
+            _ => println!("oh"),
             
         }
     while i != nbre_instruction {
@@ -59,7 +85,7 @@ fn random_robot(robot :&mut Vec<Robot>,terrain :&mut Terrain,id : i32){
             0 => robot_instruction.push(&Instruction::F),
             1 => robot_instruction.push(&Instruction::R),
             2 => robot_instruction.push(&Instruction::L),
-            _ => (),
+            _ => println!("ah"),
             
         }
         i += 1;
@@ -70,7 +96,7 @@ fn random_world(mut robot : &mut Vec<Robot>) -> Terrain {
     let mut rng= rand::thread_rng();
     let mut terrain = Terrain {x : rng.gen_range(1, 20) ,y : rng.gen_range(1, 20) };
 
-    let nbre_robots = rng.gen_range(1, 10);
+    let nbre_robots = rng.gen_range(0, 10);
 
     let mut p = 0;
 
@@ -94,16 +120,21 @@ fn file(mut robot :&mut Vec<Robot>) -> Terrain{
     let mut id : i32 = 0;
 
     let terrain = Terrain {x : c[0].parse::<i32>().unwrap(), y : c[1].parse::<i32>().unwrap(),};
-
+    //on  considere que à partir de c[3] on a les robots
     for i in 3..c.len(){
+    //lorsque que que c[i] == "" on considere qu'on passe à un autre robot
         if c[i] == "" {
+    //Un robot doit recevoir 4 String (x,y,orientation,instruction)
             if m.len() == 4{
                 create_robot(&mut robot,m.clone(),id,'N');
                 id += 1;
                 m.clear();
             }
+    //Si le vecteur n'a reçu que 3 string (x,y,orientation),cela signifie qu'il n'a pas reçu d'instruction
             else if m.len() == 3{
                 m.push(c[i]);
+                println!("Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
+    //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
                 create_robot(&mut robot,m.clone(),id,'O');
                 id += 1;
                 m.clear();
@@ -286,33 +317,9 @@ impl <'a> fmt::Display for Robot<'a> {
 fn main() {
 
     let mut robot = Vec::new();
-    let mut terrain;
 
     println!("\nVoulez-vous génerer un monde aléatoire ?\nY/N ?");
-    loop {
-    let mut input = String::new();
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {  
-                match input.as_str().trim() {
-                    "Y" => {    
-                            println!("Dac'\n{}","Generation du monde aléatoire en cours 🌍 ...".green());
-                            terrain = random_world(&mut robot);
-                            break;
-                    }
-                    "N" => {
-                            println!("Dac'\n{}","Generation du monde en cours 🌍 ...".green());
-                            terrain = file(&mut robot);
-                            break;
-
-                    }
-                    _=> println!("Y/N ?"),
-                } 
-            }
-            Err(error) => println!("????: {}", error),
-        }
-    }
-   
-
+    let mut terrain : Terrain = choice(&mut robot);
 
     //Si le robot est vide, on ne lance pas le programme
     if robot.len() != 0 {
@@ -321,8 +328,9 @@ fn main() {
         game(terrain.x,terrain.y,&mut robot);
         initial_final(&mut robot,"Position finale".to_string());
     }
-  
-
+    else{
+        println!("Votre monde n'a pas de robot 🤡");
+    }
 
 }
 
