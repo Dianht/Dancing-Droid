@@ -35,7 +35,6 @@ struct Terrain {
     y: i32,
 }
 fn choice(mut robot: &mut Vec<Robot>) -> Terrain {
-    let terrain;
     //Tant que l'utilisateur n'aura pas entré une réponse valide, on fera une boucle
     loop {
         let mut input = String::new();
@@ -48,13 +47,11 @@ fn choice(mut robot: &mut Vec<Robot>) -> Terrain {
                             "\n{}",
                             "Generation du monde aléatoire en cours 🌍 ...".green()
                         );
-                        terrain = random_world(&mut robot);
-                        return terrain;
+                        return random_world(&mut robot);
                     }
                     "N" => {
                         println!("\n{}", "Generation du monde en cours 🌍 ...".green());
-                        terrain = file(&mut robot);
-                        return terrain;
+                        return file(&mut robot);
                     }
                     _ => println!("Y/N ?"),
                 }
@@ -366,12 +363,12 @@ fn main() {
     let mut terrain: Terrain = choice(&mut robot);
 
     //Si le robot est vide, on ne lance pas le programme
-    if robot.len() != 0 {
+    if robot.is_empty() {
+        println!("Votre monde n'a pas de robot 🤡");
+    } else {
         display(&mut robot, &mut terrain);
         initial_final(&mut robot, "Position initial".to_string());
         game(terrain.x, terrain.y, &mut robot);
         initial_final(&mut robot, "Position finale".to_string());
-    } else {
-        println!("Votre monde n'a pas de robot 🤡");
     }
 }
