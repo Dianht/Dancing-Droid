@@ -4,6 +4,8 @@ pub mod display;
 pub mod normal_game;
 pub mod random_game;
 pub mod rules;
+pub mod file;
+
 
 #[derive(Debug)]
 pub enum Orientation {

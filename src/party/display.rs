@@ -28,7 +28,7 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                             "└[ ∵ ]┘".blue(),
                             "[┐∵]┘".green()
                         );
-                        return party::normal_game::file(&mut robot);
+                        return party::file::file(&mut robot);
                     }
                     _ => println!("Y/N ?"),
                 }
