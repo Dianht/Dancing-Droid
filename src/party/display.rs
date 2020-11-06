@@ -39,7 +39,6 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
 }
 
 pub fn initial_final(robot: &mut Vec<party::Robot>, position: String) {
-
     for i in 0..robot.len() {
         let id = robot[i].id;
         //On le parse pour mettre des jolies couleurs

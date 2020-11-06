@@ -32,7 +32,7 @@ pub fn collision(
     lim_y: i32,
     lim_x: i32,
     m: usize,
-    crash : &mut HashSet<party::Crash>,
+    crash: &mut HashSet<party::Crash>,
     obstacle: (i32, i32),
 ) {
     for i in 0..robot.len() {
@@ -69,7 +69,6 @@ pub fn collision(
                 robot[m].y = tmp_y;
             }
         } else if robot[m].x == obstacle.0 && robot[m].y == obstacle.1 {
-            
             let s = format!(
                 "{} 🤮\nLe {}<{}> se met à vomir, le videur le sort de la piste de danse",
                 "Obstacle".magenta().bold(),

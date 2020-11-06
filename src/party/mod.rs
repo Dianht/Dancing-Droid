@@ -34,7 +34,7 @@ pub struct Terrain {
     pub x: i32,
     pub y: i32,
 }
-#[derive(Hash, Eq, PartialEq,Debug)]
+#[derive(Hash, Eq, PartialEq, Debug)]
 pub enum Crash {
     Collision(String),
     Obstacle(String),
@@ -48,11 +48,11 @@ impl fmt::Display for Terrain {
 }
 impl fmt::Display for Crash {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       match &*self {
-           Crash::Collision(e) => write!(f, "{}",e),
-           Crash::Obstacle(e) => write!(f, "{}",e),
-           Crash::Attention(e) => write!(f, "{}",e),
-       }
+        match &*self {
+            Crash::Collision(e) => write!(f, "{}", e),
+            Crash::Obstacle(e) => write!(f, "{}", e),
+            Crash::Attention(e) => write!(f, "{}", e),
+        }
     }
 }
 impl<'a> fmt::Display for Robot<'a> {
@@ -64,4 +64,3 @@ impl<'a> fmt::Display for Robot<'a> {
         )
     }
 }
-

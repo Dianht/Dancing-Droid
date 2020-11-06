@@ -5,7 +5,7 @@ use std::collections::HashSet;
 pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, vide: char) {
     let mut robot_instruction: Vec<&party::Instruction> = Vec::new();
     let mut position: Vec<i32> = Vec::new();
-    let mut orientation = party::Orientation::North; 
+    let mut orientation = party::Orientation::North;
 
     for i in 0..2 {
         let _number = match c[i].parse::<i32>() {
@@ -61,8 +61,7 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
 }
 
 pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>, terrain: party::Terrain) {
-    
-    let mut crash : HashSet<party::Crash> = HashSet::new();
+    let mut crash: HashSet<party::Crash> = HashSet::new();
     let mut rng = rand::thread_rng();
     let obstacle = (rng.gen_range(0, terrain.x), rng.gen_range(0, terrain.y));
 
@@ -74,22 +73,22 @@ pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>, terrain: 
                 tmp = (robot[i].x, robot[i].y);
                 party::rules::instruction(robot[i].instruction[x], &mut robot[i]);
                 if robot.len() > 1 {
-                    party::rules::collision(tmp.0, tmp.1, &mut robot, lim_y, lim_x, i,&mut crash, obstacle);
+                    party::rules::collision(
+                        tmp.0, tmp.1, &mut robot, lim_y, lim_x, i, &mut crash, obstacle,
+                    );
                 }
             }
         }
         taille(robot);
     }
-    
-    if crash.is_empty(){
+
+    if crash.is_empty() {
         println!("La soirée s'est bien passé, aucun incident à déplorer");
-    }
-    else{
-        for aie in &crash{
-            println!("{}",aie);
+    } else {
+        for aie in &crash {
+            println!("{}", aie);
         }
     }
-    
 }
 
 pub fn taille(robot: &mut Vec<party::Robot>) -> usize {
