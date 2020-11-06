@@ -1,11 +1,10 @@
 use std::fmt; // On importe le module `fmt`
 
 pub mod display;
+pub mod file;
 pub mod normal_game;
 pub mod random_game;
 pub mod rules;
-pub mod file;
-
 
 #[derive(Debug)]
 pub enum Orientation {
@@ -29,14 +28,31 @@ pub struct Robot<'a> {
     orientation: Orientation,
     instruction: Vec<&'a Instruction>,
 }
+
 #[derive(Debug)]
 pub struct Terrain {
     pub x: i32,
     pub y: i32,
 }
+#[derive(Hash, Eq, PartialEq,Debug)]
+pub enum Crash {
+    Collision(String),
+    Obstacle(String),
+    Attention(String),
+}
+
 impl fmt::Display for Terrain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "x_max = {}, y_max = {}", self.x, self.y)
+    }
+}
+impl fmt::Display for Crash {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       match &*self {
+           Crash::Collision(e) => write!(f, "{}",e),
+           Crash::Obstacle(e) => write!(f, "{}",e),
+           Crash::Attention(e) => write!(f, "{}",e),
+       }
     }
 }
 impl<'a> fmt::Display for Robot<'a> {
@@ -48,3 +64,4 @@ impl<'a> fmt::Display for Robot<'a> {
         )
     }
 }
+

@@ -14,9 +14,9 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                         println!(
                             "\n{}\n         {}{}{}",
                             "Generation du monde aléatoire en cours 🌍 ...".green(),
-                            "└[∵┌]".cyan(),
-                            "└[ ∵ ]┘".yellow(),
-                            "[┐∵]┘".magenta()
+                            "└[∵┌]".cyan().bold(),
+                            "└[ ∵ ]┘".yellow().bold(),
+                            "[┐∵]┘".magenta().bold()
                         );
                         return party::random_game::random_world(&mut robot);
                     }
@@ -24,9 +24,9 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                         println!(
                             "\n{}\n         {}{}{}",
                             "Generation du monde aléatoire en cours 🌍 ...".green(),
-                            "└[∵┌]".red(),
-                            "└[ ∵ ]┘".blue(),
-                            "[┐∵]┘".green()
+                            "└[∵┌]".red().bold(),
+                            "└[ ∵ ]┘".blue().bold(),
+                            "[┐∵]┘".green().bold()
                         );
                         return party::file::file(&mut robot);
                     }
@@ -39,19 +39,27 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
 }
 
 pub fn initial_final(robot: &mut Vec<party::Robot>, position: String) {
+
     for i in 0..robot.len() {
         let id = robot[i].id;
         //On le parse pour mettre des jolies couleurs
         let s = id.to_string();
-        println!(
-            "{} du Robot<{}>  x : {} y : {}",
-            position.magenta(),
-            s.magenta(),
-            robot[i].x,
-            robot[i].y
-        );
+        if robot[i].instruction.is_empty() {
+            println!(
+                "Position {} du Robot<{}> -> chez lui (s'est pris une cuite)",
+                position,
+                s.green()
+            )
+        } else {
+            println!(
+                "Position {} du Robot<{}> -> x : {} y : {}",
+                position,
+                s.magenta().bold(),
+                robot[i].x,
+                robot[i].y
+            );
+        }
     }
-    println!("\n");
 }
 
 pub fn display(robot: &mut Vec<party::Robot>, terrain: &mut party::Terrain) {

@@ -1,71 +1,11 @@
 use crate::party;
 use rand::Rng;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
+use std::collections::HashSet;
 
-pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
-    let path = Path::new("../two_robots.txt");
-    let display = path.display();
-
-    let mut file = match File::open(&path) {
-        Err(why) => panic!("Impossible d'ouvrir {}: {}", display, why),
-        Ok(file) => file,
-    };
-
-    let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Ok(_) => (),
-        Err(why) => panic!("Impossible de lire {}: {}", display, why),
-    }
-    let c: Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
-
-    let mut m: Vec<&str> = Vec::new();
-    let mut id: i32 = 0;
-
-    let mut terrain = party::Terrain { x: 0, y: 0 };
-
-    let _number = match c[0].parse::<i32>() {
-        Ok(number) => terrain.x = number,
-        Err(_) => (),
-    };
-    let _number = match c[1].parse::<i32>() {
-        Ok(number) => terrain.y = number,
-        Err(_) => (),
-    };
-
-    //on  considere que à partir de c[3] on a les robots
-    for i in 3..c.len() {
-        //lorsque que que c[i] == "" on considere qu'on passe à un autre robot
-        if c[i] == "" {
-            //Un robot doit recevoir 4 String (x,y,orientation,instruction)
-            if m.len() == 4 {
-                create_robot(&mut robot, &mut m, id, 'N');
-                id += 1;
-                m.clear();
-            }
-            //Si le vecteur n'a reçu que 3 string (x,y,orientation),cela signifie qu'il n'a pas reçu d'instruction
-            else if m.len() == 3 {
-                m.push(c[i]);
-                println!("🚨 Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
-                //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
-                create_robot(&mut robot, &mut m, id, 'O');
-                id += 1;
-                m.clear();
-            } else {
-                break;
-            }
-        } else {
-            m.push(c[i]);
-        }
-    }
-
-    return terrain;
-}
 pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, vide: char) {
     let mut robot_instruction: Vec<&party::Instruction> = Vec::new();
     let mut position: Vec<i32> = Vec::new();
-    let mut orientation = party::Orientation::North; //Faut trouver un autre moyen pour l'initialiser
+    let mut orientation = party::Orientation::North; 
 
     for i in 0..2 {
         let _number = match c[i].parse::<i32>() {
@@ -120,8 +60,39 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
     });
 }
 
-pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>) {
-    //On trouve le grand nombre d'instruction qu'a un robots
+pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>, terrain: party::Terrain) {
+    
+    let mut crash : HashSet<party::Crash> = HashSet::new();
+    let mut rng = rand::thread_rng();
+    let obstacle = (rng.gen_range(0, terrain.x), rng.gen_range(0, terrain.y));
+
+    let mut tmp: (i32, i32);
+
+    for x in 0..taille(robot) {
+        for i in 0..robot.len() {
+            if x < robot[i].instruction.len() {
+                tmp = (robot[i].x, robot[i].y);
+                party::rules::instruction(robot[i].instruction[x], &mut robot[i]);
+                if robot.len() > 1 {
+                    party::rules::collision(tmp.0, tmp.1, &mut robot, lim_y, lim_x, i,&mut crash, obstacle);
+                }
+            }
+        }
+        taille(robot);
+    }
+    
+    if crash.is_empty(){
+        println!("La soirée s'est bien passé, aucun incident à déplorer");
+    }
+    else{
+        for aie in &crash{
+            println!("{}",aie);
+        }
+    }
+    
+}
+
+pub fn taille(robot: &mut Vec<party::Robot>) -> usize {
     let mut taille = robot[0].instruction.len();
     for i in 0..robot.len() - 1 {
         if taille > robot[i + 1].instruction.len() {
@@ -130,18 +101,5 @@ pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>) {
             taille = robot[i + 1].instruction.len()
         }
     }
-    // Nous permetra de stocker les valeurs des coordonées du robot avant l'instruction
-    let mut tmp: (i32, i32);
-    //Une boucle jusqu'à que le robot avec le + d'instruction n'aura plus d'instruction
-    for x in 0..taille {
-        for i in 0..robot.len() {
-            //Une boucle qui fera jouer les robots un par un
-            if x < robot[i].instruction.len() {
-                //On ignorera les Robot qui n'ont plus d'instruction
-                tmp = (robot[i].x, robot[i].y);
-                party::rules::instruction(robot[i].instruction[x], &mut robot[i]);
-                party::rules::collision(tmp.0, tmp.1, &mut robot, lim_y, lim_x, i);
-            }
-        }
-    }
+    return taille;
 }

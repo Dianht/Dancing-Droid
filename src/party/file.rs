@@ -1,8 +1,8 @@
+use crate::party;
+use colored::*;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use crate::party;
-
 
 pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
     let path = Path::new("../two_robots.txt");
@@ -47,7 +47,8 @@ pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
             //Si le vecteur n'a reçu que 3 string (x,y,orientation),cela signifie qu'il n'a pas reçu d'instruction
             else if m.len() == 3 {
                 m.push(c[i]);
-                println!("🚨 Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",id);
+                let s = id.to_string();
+                println!("🚨 Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",s.red());
                 //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
                 party::normal_game::create_robot(&mut robot, &mut m, id, 'O');
                 id += 1;

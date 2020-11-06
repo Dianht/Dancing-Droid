@@ -5,7 +5,7 @@ fn main() {
     let mut robot = Vec::new();
 
     print!(
-        "🤖 {} Dancing Droid 0.3.1 {} 🦾\n",
+        "🤖 {} Dancing Droid 0.3.3 {} 🦾\n",
         "......".cyan(),
         "......".cyan()
     );
@@ -21,8 +21,11 @@ fn main() {
         println!("Votre monde n'a pas de robot 🤡");
     } else {
         party::display::display(&mut robot, &mut terrain);
-        party::display::initial_final(&mut robot, "Position initial".to_string());
-        party::normal_game::game(terrain.x, terrain.y, &mut robot);
-        party::display::initial_final(&mut robot, "Position finale".to_string());
+        println!("========================\nEtat initial\n========================");
+        party::display::initial_final(&mut robot, "initial".cyan().bold().to_string());
+        println!("========================\n└[∵┌]└[ ∵ ]┘[┐∵]┘\n========================");
+        party::normal_game::game(terrain.x, terrain.y, &mut robot, terrain);
+        println!("========================\nEtat final\n========================");
+        party::display::initial_final(&mut robot, "finale".blue().bold().to_string());
     }
 }
