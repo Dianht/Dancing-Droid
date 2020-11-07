@@ -1,6 +1,7 @@
 use crate::party;
 use rand::Rng;
 use std::collections::HashSet;
+use std::{thread, time};
 
 pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, vide: char) {
     let mut robot_instruction: Vec<&party::Instruction> = Vec::new();
@@ -48,25 +49,42 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
             i += 1;
         }
     }
-
-    let y = position[0];
-    let x = position[1];
     robot.push(party::Robot {
         id: id,
-        x: x,
-        y: y,
+        x: position[1],
+        y: position[0],
         orientation: orientation,
         instruction: robot_instruction,
     });
 }
 
-pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>, terrain: party::Terrain) {
+pub fn game(
+    lim_x: i32,
+    lim_y: i32,
+    mut robot: &mut Vec<party::Robot>,
+    mut terrain: party::Terrain,
+) {
     let mut crash: HashSet<party::Crash> = HashSet::new();
     let mut rng = rand::thread_rng();
-    let obstacle = (rng.gen_range(0, terrain.x), rng.gen_range(0, terrain.y));
+    let mut max = (terrain.x * terrain.y) / 3;
+    if max == 0 {
+        max = 1;
+    }
+    let mut obstacle = Vec::new();
+    let mut i = 0;
+    for _ in 0..rng.gen_range(0, max) {
+        obstacle.push(party::Obstacle {
+            x: rng.gen_range(0, terrain.x),
+            y: rng.gen_range(0, terrain.y),
+            id: i,
+        });
+        i += 1;
+        if i > 2 {
+            i = 0;
+        }
+    }
 
     let mut tmp: (i32, i32);
-
     for x in 0..taille(robot) {
         for i in 0..robot.len() {
             if x < robot[i].instruction.len() {
@@ -74,19 +92,28 @@ pub fn game(lim_x: i32, lim_y: i32, mut robot: &mut Vec<party::Robot>, terrain: 
                 party::rules::instruction(robot[i].instruction[x], &mut robot[i]);
                 if robot.len() > 1 {
                     party::rules::collision(
-                        tmp.0, tmp.1, &mut robot, lim_y, lim_x, i, &mut crash, obstacle,
+                        tmp,
+                        i,
+                        &mut robot,
+                        lim_y,
+                        lim_x,
+                        i,
+                        &mut crash,
+                        &mut obstacle,
+                        &mut terrain,
                     );
                 }
             }
         }
         taille(robot);
     }
-
+    let ten_millis = time::Duration::from_millis(500);
     if crash.is_empty() {
         println!("La soirée s'est bien passé, aucun incident à déplorer");
     } else {
         for aie in &crash {
             println!("{}", aie);
+            thread::sleep(ten_millis);
         }
     }
 }

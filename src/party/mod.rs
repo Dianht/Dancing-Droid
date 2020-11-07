@@ -34,6 +34,14 @@ pub struct Terrain {
     pub x: i32,
     pub y: i32,
 }
+
+#[derive(Debug)]
+pub struct Obstacle {
+    x: i32,
+    y: i32,
+    id: i32,
+}
+
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub enum Crash {
     Collision(String),

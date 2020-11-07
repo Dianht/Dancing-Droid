@@ -1,38 +1,39 @@
 use crate::party;
 use colored::*;
 use std::io; //Gadjet mais ça rajoute des couleurs ajouter colored = "2" dans Cargo.toml
+use std::{thread, time};
 
 pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
-    //Tant que l'utilisateur n'aura pas entré une réponse valide, on fera une boucle
+    let ten_millis = time::Duration::from_millis(2000);
     loop {
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                match input.as_str().trim() {
-                    //.trim() pour enlever les \n
-                    "Y" => {
-                        println!(
-                            "\n{}\n         {}{}{}",
-                            "Generation du monde aléatoire en cours 🌍 ...".green(),
-                            "└[∵┌]".cyan().bold(),
-                            "└[ ∵ ]┘".yellow().bold(),
-                            "[┐∵]┘".magenta().bold()
-                        );
-                        return party::random_game::random_world(&mut robot);
-                    }
-                    "N" => {
-                        println!(
-                            "\n{}\n         {}{}{}",
-                            "Generation du monde aléatoire en cours 🌍 ...".green(),
-                            "└[∵┌]".red().bold(),
-                            "└[ ∵ ]┘".blue().bold(),
-                            "[┐∵]┘".green().bold()
-                        );
-                        return party::file::file(&mut robot);
-                    }
-                    _ => println!("Y/N ?"),
+            Ok(_) => match input.as_str().trim() {
+                "Y" => {
+                    println!(
+                        "\n{}\n         {}{}{}",
+                        "Generation du monde aléatoire en cours 🌍 ...\n".green(),
+                        "└[∵┌]".cyan().bold(),
+                        "└[ ∵ ]┘".yellow().bold(),
+                        "[┐∵]┘".magenta().bold()
+                    );
+                    thread::sleep(ten_millis);
+                    return party::random_game::random_world(&mut robot);
                 }
-            }
+                "N" => {
+                    println!(
+                        "\n{}\n         {}{}{}",
+                        "Generation du monde aléatoire en cours 🌍 ...".green(),
+                        "└[∵┌]".red().bold(),
+                        "└[ ∵ ]┘".blue().bold(),
+                        "[┐∵]┘".green().bold()
+                    );
+                    thread::sleep(ten_millis);
+
+                    return party::file::file(&mut robot);
+                }
+                _ => println!("Y/N ?"),
+            },
             Err(error) => println!("????: {}", error),
         }
     }
