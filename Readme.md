@@ -14,15 +14,37 @@ très à l'aise le but de se projet de de faire coder et progresser tout le mond
 
 *Nouvelles dates de rendu !*
 
-- L2A: 30 octobre 2020
-- L2B: 06 novembre 2020
+- L2 A-B: Dimanche 08 novembre 2020 à 18:00 pile heure de Paris
 
-Note de @darnuria: Pourquoi les L2B le 6 novembre? le 9 octobre le cours en
-demi groupe, sera en dégradé pour vérifier que tout le monde a bien un
-environnement installé, paré à l'autonomie.
+Procédure d'annonce des groupes:
 
-Ça me permettra de corriger rapidement et de pas laisser trainer pour vous
-donner des retours vite.
+- [L2-A](https://lite.framacalc.org/9juxgroupesrustrendur1414)
+- [L2-B](https://lite.framacalc.org/9jux-rendurustgroupes)
+
+Pensez à faire un `LISEZ_MOI.md` pour noter les détails fun, ce qui vous a plu,
+ce que vous aurriez aimer faire etc. Ou pour raconter des détails de réalisation.
+
+### Usages de dependances avec Cargo
+
+Autant que besoin, mais attention les dependances c'est avec modérations et si vous
+sentez que c'est neccessaire. Ça me derange pas mais faut comprendre ce qu'on fait! ;)
+
+### Triche ou Plaggiat
+
+Plaggiat ou triche: note entre 0 et 5. C'est facile de voir ça avec git et je ferais
+une recherche avec de quoi motiver la note. Bref trichez pas. 😎
+
+#### Partage de code: Partage != Plaggiat
+
+Supposons vous avez emprunter la magnifique fonction du groupe **Matrix Squirrel**,
+Notez explicitement toute ces situations un commentaire de la forme:
+
+`// REMIX: explication + améliorations que vous auriez faites`
+
+Je serais surement plus conciliant que si je constate du plaggiat.
+Remixer n'est pas plaggier.
+
+> Note: Quite a faire du gros partage faites une bibliothèque et partagez la... :O
 
 ## Partie obligatoire
 
@@ -80,7 +102,7 @@ En cas de collision avec un autre robot lors d'un déplacement le robot devra
 dire sur la sortie standard:
 
 Cas des collisions: Faire dire `"Robot ID<numId> Collision en (x, y)"` et ne
-pas comptabiliser le mouvement du Robot, qui occassion la collision mais
+pas comptabiliser le mouvement du Robot qui occassionne la collision, mais
 consommer son instruction.
 
 Format du fichier definisant le monde:
@@ -88,6 +110,7 @@ Format du fichier definisant le monde:
 **Important** : Dans le format de fichier la gestion des commentaires `\\` est optionnelle .
 ```txt
 5 5   // X_max Y_max
+
 1 1 N // position du robot en x=1 y=1 orientation = nord
 FLLFRF
 
@@ -119,14 +142,14 @@ depuis un fichier d'instruction, et afficher a la fin leurs positions finales.
 Dans cette version on va écrire du code pour afficher la positions des robots et
 dessiner la grille.
 
-Vous devrez pouvoir dessiner quelque chose comme cela en partant de la grille donnée en exemple plus haut
-dans votre terminal:
+Vous devrez pouvoir dessiner quelque chose comme cela en partant de la grille
+donnée en exemple plus haut dans votre terminal:
 
 ```txt
 Terrain { x_max = 5; y_max = 5 }
 Robots [
- { id = 0, x = 1; y = 1; orientation: North },
- { id = 1; x = 3; y = 2; orientation: South },
+ { id = 0, x = 1; y = 1; orientation: North, instructions: [F,L,L,F,R,F], },
+ { id = 1; x = 3; y = 2; orientation: South, instructions: [F,F,L,F,R,R,F], },
 ]
 Etat initial
 ============================
@@ -143,7 +166,7 @@ Etat final
 4 .  .  .  .  .  .
 3 .  .  .  .  .  .
 2 .  .  .  .  .  .
-1 .  ➡  .  .  .  .
+1 ⬅  .  .  .  .  .
 0 .  .  .  ⬅  .  .
   0  1  2  3  4  5
 ```
