@@ -2,6 +2,7 @@ use std::fmt; // On importe le module `fmt`
 
 pub mod display;
 pub mod file;
+pub mod instructions;
 pub mod normal_game;
 pub mod random_game;
 pub mod rules;
@@ -49,6 +50,7 @@ pub enum Crash {
     Attention(String),
 }
 
+//On implémente le trait Display
 impl fmt::Display for Terrain {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "x_max = {}, y_max = {}", self.x, self.y)

@@ -1,48 +1,24 @@
 use crate::party;
 use colored::*;
 use rand::Rng;
-use std::collections::HashSet;
 
-pub fn instruction(instruction_robot: &party::Instruction, robot: &mut party::Robot) {
-    match instruction_robot {
-        party::Instruction::F => match robot.orientation {
-            party::Orientation::North => robot.y = robot.y + 1,
-            party::Orientation::West => robot.x = robot.x - 1,
-            party::Orientation::Est => robot.x = robot.x + 1,
-            party::Orientation::South => robot.y = robot.y - 1,
-        },
-        party::Instruction::L => match robot.orientation {
-            party::Orientation::North => robot.orientation = party::Orientation::West,
-            party::Orientation::West => robot.orientation = party::Orientation::South,
-            party::Orientation::Est => robot.orientation = party::Orientation::North,
-            party::Orientation::South => robot.orientation = party::Orientation::Est,
-        },
-        party::Instruction::R => match robot.orientation {
-            party::Orientation::North => robot.orientation = party::Orientation::Est,
-            party::Orientation::West => robot.orientation = party::Orientation::North,
-            party::Orientation::Est => robot.orientation = party::Orientation::South,
-            party::Orientation::South => robot.orientation = party::Orientation::West,
-        },
-    }
-}
-
-pub fn collision(
+pub fn crash(
     tmp: (i32, i32),
-    i_instru: usize,
     robot: &mut Vec<party::Robot>,
-    lim_y: i32,
-    lim_x: i32,
     m: usize,
-    crash: &mut HashSet<party::Crash>,
-    obstacle: &mut Vec<party::Obstacle>,
-    terrain: &mut party::Terrain,
+    crash: &mut Vec<party::Crash>,
 ) {
-    let mut rng = rand::thread_rng();
+    //La fonction crash va push dans le vecteur crash les collision déroulé durant la soirée
+    //On va inspecter tout les robots pour comparer leurs coordonnées, ce n'est pas une bonne méthode
+    //mais bon...
+
     for i in 0..robot.len() {
-        if robot[m].x == robot[i].x && robot[m].y == robot[i].y {
-            if robot[m].id != robot[i].id {
+        //Si l'id du robot 1 et du robot 2 sont pas les même alors on peut les comparer
+        //Si les coordonnées des deux robots sont les mêmes alors il y a là une collision
+        if robot[m].id != robot[i].id {
+            if robot[m].x == robot[i].x && robot[m].y == robot[i].y {
                 let s = format!(
-                    "{} 💥\n{}<{}> fonce vers {}<{}> aux coordonnée x : {} y : {} !",
+                    "{} 💥 \n{}<{}> fonce vers {}<{}> aux coordonnée x : {} y : {} !",
                     "Collision !".red().bold(),
                     "Le Robot".cyan(),
                     robot[m].id,
@@ -51,83 +27,128 @@ pub fn collision(
                     robot[m].x,
                     robot[m].y
                 );
-                crash.insert(party::Crash::Collision(s));
+                //Le robot reprend alors sa position pre-collision
                 robot[m].x = tmp.0;
                 robot[m].y = tmp.1;
+                //On push le texte de collision dans le vecteur crash
+                crash.push(party::Crash::Collision(s));
             }
-        } else if robot[m].x == lim_x + 1
-            || robot[m].x < 0
-            || robot[m].y == lim_y + 1
-            || robot[m].y < 0
-        {
-            if robot[m].id != robot[i].id {
-                let s = format!(
-                    "{} 🚧\n{}<{}> se dirige vers les limites de la piste ! (il risque de tomber)",
-                    "Attention !".red().bold(),
-                    "Le Robot".yellow(),
-                    robot[m].id
+        }
+    }
+}
+pub fn limit(
+    tmp: (i32, i32),
+    robot: &mut Vec<party::Robot>,
+    m: usize,
+    crash: &mut Vec<party::Crash>,
+    terrain: &mut party::Terrain,
+) {
+    //La fonction limit va push dans le vecteur crash tout les robots qui tentent de dépasser la limite
+    //du terrain
+    if robot[m].x == terrain.x + 1
+        || robot[m].x == -1
+        || robot[m].y == terrain.y + 1
+        || robot[m].y == -1
+    {
+        let s = format!(
+                "{} 🚧 |x : {} | y : {}|\n{}<{}> se dirige vers les limites de la piste ! (il risque de tomber)",
+                "Attention !".red().bold(),
+                robot[m].x,robot[m].y,
+                "Le Robot".yellow(),
+                robot[m].id
                 );
-                crash.insert(party::Crash::Attention(s));
-                robot[m].x = tmp.0;
-                robot[m].y = tmp.1;
-            }
-        } else {
-            for o in 0..obstacle.len() {
-                match obstacle[o].id {
-                    0 => {
-                        if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
-                            let s = format!(
-                                    "{} 😵\nLe {}<{}> se met à vomir 🤮, le videur le sort de la piste de danse",
-                                    "Obstacle".magenta().bold(),
-                                    "Robot".green(),
-                                    robot[m].id
-                                );
-                            crash.insert(party::Crash::Collision(s));
-                            robot[m].instruction.clear(); //On nettoie sa liste d'instruction
-                            return;
-                        }
-                    }
-                    1 => {
-                        if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
-                            let s = format!(
-                                "{} 😵\nLe {}<{}> est en feu 🔥, il commence à improvisé une danse",
-                                "Obstacle".magenta().bold(),
-                                "Robot".green(),
-                                robot[m].id
-                            );
-                            let u: Vec<_> = robot[m].instruction.drain(i_instru + 1..).collect();
-                            if u.is_empty() {
-                                for _ in 0..u.len() {
-                                    let aleatoire = rng.gen_range(0, 3);
-                                    match aleatoire {
-                                        0 => robot[m].instruction.push(&party::Instruction::F),
-                                        1 => robot[m].instruction.push(&party::Instruction::R),
-                                        2 => robot[m].instruction.push(&party::Instruction::L),
-                                        _ => (),
-                                    }
-                                }
-                            }
-                            crash.insert(party::Crash::Collision(s));
-                            return;
-                        }
-                    }
-                    2 => {
-                        if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
-                            let s = format!(
-                                "{} 😵\nLe {}<{}> s'est téléporté grâce à une faille spacio-temporelle 🌀",
-                                "Obstacle".magenta().bold(),
-                                "Robot".green(),
-                                robot[m].id
-                            );
-                            robot[m].x = rng.gen_range(0, terrain.x);
-                            robot[m].y = rng.gen_range(0, terrain.y);
-                            crash.insert(party::Crash::Collision(s));
-                            return;
-                        }
-                    }
-                    _ => (),
+        //Le robot reprend alors sa position pre-collision
+        robot[m].x = tmp.0;
+        robot[m].y = tmp.1;
+        //On push le texte de collision dans le vecteur crash
+        crash.push(party::Crash::Attention(s));
+    }
+}
+pub fn obstacle(
+    obstacle: &mut Vec<party::Obstacle>,
+    robot: &mut Vec<party::Robot>,
+    m: usize,
+    crash: &mut Vec<party::Crash>,
+    terrain: &mut party::Terrain,
+) {
+    //La fonction obstacle va push dans le vecteur crash tout les robots qui ont rencontré un obstacle
+    let mut rng = rand::thread_rng();
+    //On va comparer les coordonnée du robot avec tout les coordonnée des obstacles
+    //(C'est pas le meilleur des moyens mais bon...)
+    for o in 0..obstacle.len() {
+        //En fonction de l'id du robot, on crée des obstacles
+        //si l'id est 1 par exemple l'obstacle est que le robot devient vomi
+        match obstacle[o].id {
+            0 => {
+                //Si l'id est 0 alors l'obstacle consistera à ce que le robot s'arrete et que sa liste d'instruction soit vide
+                //On compare les coordonées du robot et de l'obstacle
+                if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
+                    let s = format!(
+                            "|{} 😵 |x:  {} | y : {}|\nLe {}<{}> se met à vomir 🤮, le videur le sort de la piste de danse",
+                            "Obstacle".magenta().bold(),
+                        robot[m].x,robot[m].y,
+                            "Robot".green(),
+                            robot[m].id
+                        );
+                    //On oublie pas d'enlever cet obstacle de la liste
+                    obstacle.remove(o);
+                    //On push le texte de l'obstacle dans crash
+                    crash.push(party::Crash::Collision(s));
+                    //On nettoie sa liste d'instruction
+                    robot[m].instruction.clear();
+                    //Le robot se trouve plus sur la piste
+                    robot[m].x = -2;
+                    robot[m].y = -2;
+                    //On a plus besoin de voir les autres obstacles
+                    return;
                 }
             }
+            1 => {
+                //Si l'id est 1 alors l'obstacle consistera à ce que le robot s'ajoute lui même 3 instructions
+                if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
+                    let s = format!(
+                        "{} 😵 |x : {} | y : {}|\nLe {}<{}> est en feu 🔥, il commence à improvisé une danse et le rajoute dans sa liste d'instruction",
+                        "Obstacle".magenta().bold(),
+                        robot[m].x,robot[m].y,
+                        "Robot".green(),
+                        robot[m].id
+                    );
+                    //Le robot improvise 3 mouvements sur la piste de dance
+                    //qu'il va généré aléatoirement
+                    for _ in 0..3 {
+                        robot[m].instruction.push(party::random_game::random_instruction());
+                    }
+
+                    //On oublie pas d'enlever cet obstacle de la liste
+                    obstacle.remove(o);
+                    crash.push(party::Crash::Collision(s));
+                    //On a plus besoin de voir les autres obstacles
+                    return;
+                }
+            }
+            2 => {
+                if robot[m].x == obstacle[o].x && robot[m].y == obstacle[o].y {
+                    //On crée deux variables qui correspondent aux futurs coordonnée généré aléatoirement du robot
+                    let x = rng.gen_range(0, terrain.x);
+                    let y = rng.gen_range(0, terrain.y);
+                    let s = format!(
+                        "{} 😵 |x : {} | y : {}|\nLe {}<{}> s'est téléporté grâce à une faille spacio-temporelle aux coordonnées x : {}  y : {} 🌀 !",
+                        "Obstacle".magenta().bold(),
+                        robot[m].x,robot[m].y,
+                        "Robot".green(),
+                        robot[m].id,
+                        x,y
+                    );
+                    robot[m].x = x;
+                    robot[m].y = y;
+                    //On oublie pas d'enlever cet obstacle de la liste
+                    obstacle.remove(o);
+                    //On a plus besoin de voir les autres obstacles
+                    crash.push(party::Crash::Collision(s));
+                    return;
+                }
+            }
+            _ => (),
         }
     }
 }
