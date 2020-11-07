@@ -1,7 +1,7 @@
 use crate::party;
 
 pub fn instruction(instruction_robot: &party::Instruction, robot: &mut party::Robot) {
-    //Cette fonction va permettre au de realisé les mouvements du robot
+    //Cette fonction va permettre de realisé les mouvements du robot
     //en fonction des instructins
     match instruction_robot {
         //En fonction de l'orientation au moment où l'instruction est F
