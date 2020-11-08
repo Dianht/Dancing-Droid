@@ -1,13 +1,11 @@
 Le programme DancingDroid fonctionne de deux manière ; soit avec des robots inscrit dans le fichier txt "two_robot.txt" soit en génerant aléatoirement des robots.
 Le fichier txt doit respecter ce format :
 
-X X //Cordonnée du terrain
+terrain_x terrain_y
 
 x_pos y_pos orientation   
 instructions
 saut de ligne
-
-
 
 Dans les frustration du projet :
 Malgré un projet très amusant, on a rencontré des difficulté dans l'affichage, on a pu faire ce qu'on voulait, integré des émoji, ajouter des couleurs uniques à chaque robot mais hélàs.
