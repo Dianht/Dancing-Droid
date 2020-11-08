@@ -10,11 +10,14 @@ use std::path::Path;
 pub fn file(mut robot: &mut Vec<R>) -> T {
     //On crée deux variable, un qui va contenenir le chemin où se trouve le fichier des robots
     //Et l'autre pour afficher le chemin en cas de panic!
-    let path = Path::new("../DancingDroids/two_robots.txt");
+    let path = Path::new("../two_robots.txt");
     let display = path.display();
 
     let mut file = match File::open(&path) {
-        Err(why) => panic!("Impossible d'ouvrir {}: {}", display, why),
+        Err(why) => panic!(
+            "Impossible d'ouvrir : {}, faites un cargo run dans /src {}",
+            display, why
+        ),
         Ok(file) => file,
     };
 
@@ -33,7 +36,6 @@ pub fn file(mut robot: &mut Vec<R>) -> T {
 
     let mut m: Vec<&str> = Vec::new();
     let mut id: i32 = 0;
-
     let mut terrain = T { x: 0, y: 0 };
     //Bien evidemment le fichier two_robots.txt commence par les coordonnées du terrain
     //Du coup, les deux premieres cases du vecteur seront les coordonnées du terrain
@@ -82,4 +84,27 @@ pub fn file(mut robot: &mut Vec<R>) -> T {
     }
 
     return terrain;
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::party;
+    use party::Instruction as I;
+    use party::Orientation as O;
+    use party::Robot as R;
+    use party::Terrain as T;
+    #[test]
+    fn test_file() {
+        let mut rb = vec![R {
+            id: 1,
+            x: 1,
+            y: 2,
+            orientation: O::North,
+            instruction: vec![&I::F, &I::L],
+        }];
+
+        assert_eq!(file(&mut rb), T { x: 5, y: 5 });
+    }
 }

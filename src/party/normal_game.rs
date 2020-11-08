@@ -11,7 +11,7 @@ use party::display as D;
 use party::instructions as IN;
 use party::rules as RU;
 
-pub fn game(mut robot: &mut Vec<R>, mut terrain: T) {
+pub fn game(mut robot: &mut Vec<R>, mut terrain: T) -> bool {
     //Le vecteur crash va contenir touts les accidents sous forme de String
     //La variable tmp va nous permettre de garder les coordonnées avant execution de l'instruction
     //La variable obstacle va contenir un vecteur contenant les coordonnées des obstacles généré par la fonction "create_barrier"
@@ -54,6 +54,7 @@ pub fn game(mut robot: &mut Vec<R>, mut terrain: T) {
     }
     //Nous affiche ou pas les accidents survenu durant la nuit
     D::display_crash(crash);
+    return true;
 }
 
 pub fn taille(robot: &mut Vec<R>) -> usize {
@@ -70,7 +71,7 @@ pub fn taille(robot: &mut Vec<R>) -> usize {
     return taille;
 }
 
-pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) {
+pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) -> bool {
     //Le programme va parser tout les chaines de caracteres qu'il a reçu dans la variable c
     //On commence par initialiser toutes les variables que va recevoir un robot
     let mut robot_instruction: Vec<&I> = Vec::new();
@@ -134,6 +135,7 @@ pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) 
         orientation: orientation,
         instruction: robot_instruction,
     });
+    return true;
 }
 
 fn create_barrier(terrain: &mut T) -> Vec<OB> {
@@ -160,4 +162,73 @@ fn create_barrier(terrain: &mut T) -> Vec<OB> {
         }
     }
     return obstacle;
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use crate::party;
+    use party::Instruction as I;
+    use party::Orientation as O;
+    use party::Robot as R;
+    use party::Terrain as T;
+    #[test]
+    fn test_game() {
+        let mut rb = vec![R {
+            id: 1,
+            x: 1,
+            y: 2,
+            orientation: O::North,
+            instruction: vec![&I::F, &I::L],
+        }];
+        let terrain = T { x: 5, y: 5 };
+        assert_eq!(game(&mut rb, terrain), true);
+    }
+    #[test]
+    fn test_create_robot() {
+        let mut c = vec!["1", "1", "N", "FLLFRF"];
+        let mut rb = vec![R {
+            id: 1,
+            x: 1,
+            y: 2,
+            orientation: O::North,
+            instruction: vec![&I::F, &I::L],
+        }];
+        assert_eq!(create_robot(&mut rb, &mut c, 1, 'O'), true);
+    }
+    #[test]
+    fn test_taille() {
+        let mut rb = vec![
+            R {
+                id: 1,
+                x: 1,
+                y: 2,
+                orientation: O::North,
+                instruction: vec![&I::F, &I::L],
+            },
+            R {
+                id: 1,
+                x: 1,
+                y: 2,
+                orientation: O::North,
+                instruction: vec![&I::F, &I::L, &I::L],
+            },
+            R {
+                id: 1,
+                x: 1,
+                y: 2,
+                orientation: O::North,
+                instruction: vec![&I::F, &I::L],
+            },
+            R {
+                id: 1,
+                x: 1,
+                y: 2,
+                orientation: O::North,
+                instruction: vec![&I::F, &I::L, &I::F, &I::L, &I::L],
+            },
+        ];
+        assert_eq!(taille(&mut rb), 5);
+    }
 }

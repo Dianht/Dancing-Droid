@@ -30,7 +30,7 @@ pub struct Robot<'a> {
     instruction: Vec<&'a Instruction>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Terrain {
     pub x: i32,
     pub y: i32,
