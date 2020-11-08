@@ -41,7 +41,7 @@ pub fn choice(mut robot: &mut Vec<R>) -> T {
                         "└[∵┌]".red().bold(),
                         "└[ ∵ ]┘".blue().bold(),
                         "[┐∵]┘".green().bold(),
-                        "Lecture du fichier : two_robots.txt en cours".italic()
+                        "Lecture du fichier : 'two_robots.txt' en cours..."
                     );
                     //On met en pause le programme 2000ms (valeur entré dans la variable "ten_millis")
                     thread::sleep(ten_millis);

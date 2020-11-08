@@ -7,15 +7,15 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-pub fn file(mut robot: &mut Vec<R>) -> T {
+pub fn file(robot: &mut Vec<R>) -> T {
     //On crée deux variable, un qui va contenenir le chemin où se trouve le fichier des robots
     //Et l'autre pour afficher le chemin en cas de panic!
-    let path = Path::new("../two_robots.txt");
+    let path = Path::new("../DancingDroids/two_robots.txt");
     let display = path.display();
 
     let mut file = match File::open(&path) {
         Err(why) => panic!(
-            "Impossible d'ouvrir : {}, faites un cargo run dans /src {}",
+            "Impossible d'ouvrir : {}, faites un cargo run /DancingDroid /src {}",
             display, why
         ),
         Ok(file) => file,
@@ -33,7 +33,11 @@ pub fn file(mut robot: &mut Vec<R>) -> T {
     //à chaque "\n" et ' ' un string qui precede ces "\n" et ' '
     //pour avoir aussi des nombres
     let c: Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
+    return file_create_robot(robot,c);
+}
 
+
+fn file_create_robot(mut robot: &mut Vec<R>,c : Vec<&str>) -> T{
     let mut m: Vec<&str> = Vec::new();
     let mut id: i32 = 0;
     let mut terrain = T { x: 0, y: 0 };
@@ -82,8 +86,8 @@ pub fn file(mut robot: &mut Vec<R>) -> T {
             m.push(c[i]);
         }
     }
-
     return terrain;
+
 }
 
 #[cfg(test)]

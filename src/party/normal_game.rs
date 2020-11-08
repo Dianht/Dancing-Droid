@@ -23,7 +23,7 @@ pub fn game(mut robot: &mut Vec<R>, mut terrain: T) -> bool {
     //On crée une boucle qui s'arrete jusqu'à que la plus grande liste d'instructions n'ai plus d'instructions
     loop {
         //Dans cette boucle, on va envoyer notre liste d'instruction un par un dans la fonction instruction
-        //qui va nous réaliser les mouvements du robot
+        //qui va nous réaliser les mouvements du robot (iterrators are beautiful but i need "i")
         for i in 0..robot.len() {
             if x < robot[i].instruction.len() {
                 tmp = (robot[i].x, robot[i].y);
