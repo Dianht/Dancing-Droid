@@ -4,6 +4,8 @@ Le fichier txt doit respecter ce format :
 X X //Cordonnée du terrain
 
 X X X   //pos_x pos_y orientation
+
+
 XXXXXX  //Instruction du robot
 
 
