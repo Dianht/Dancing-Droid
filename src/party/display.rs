@@ -102,7 +102,7 @@ pub fn display_crash(crash: Vec<C>) {
     if crash.is_empty() {
         println!(
             "La soirée s'est bien passé, aucun incident à déplorer\n{}",
-            "signé : La Direction 🕶".italic()
+            "signé : La Direction 🕶".black().bold()
         );
     } else {
         for aie in crash.iter() {

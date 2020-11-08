@@ -72,7 +72,7 @@ pub fn obstacle(
     if obstacle.len() != 0 {
         for o in 0..obstacle.len() {
             //En fonction de l'id du robot, on crée des obstacles
-            //si l'id est 1 par exemple l'obstacle est que le robot devient vomi
+            //si l'id est 1 par exemple l'obstacle est que le robot vomi
             match obstacle[o].id {
                 0 => {
                     //Si l'id est 0 alors l'obstacle consistera à ce que le robot s'arrete et que sa liste d'instruction soit vide
@@ -96,7 +96,7 @@ pub fn obstacle(
                         robot[m].y = -2;
                         //On a plus besoin de voir les autres obstacles
                         return;
-                    }
+                    } 
                 }
                 1 => {
                     //Si l'id est 1 alors l'obstacle consistera à ce que le robot s'ajoute lui même 3 instructions
