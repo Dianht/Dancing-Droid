@@ -6,7 +6,7 @@ FLLFRF
 3 2 S
 FFLFRRF
 
-5 2 W
+5 2 S
 
 3 1 E
 FLRFFLF
