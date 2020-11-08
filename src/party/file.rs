@@ -33,11 +33,10 @@ pub fn file(robot: &mut Vec<R>) -> T {
     //à chaque "\n" et ' ' un string qui precede ces "\n" et ' '
     //pour avoir aussi des nombres
     let c: Vec<&str> = s.split(|c| c == '\n' || c == ' ').collect();
-    return file_create_robot(robot,c);
+    return file_create_robot(robot, c);
 }
 
-
-fn file_create_robot(mut robot: &mut Vec<R>,c : Vec<&str>) -> T{
+fn file_create_robot(mut robot: &mut Vec<R>, c: Vec<&str>) -> T {
     let mut m: Vec<&str> = Vec::new();
     let mut id: i32 = 0;
     let mut terrain = T { x: 0, y: 0 };
@@ -87,7 +86,6 @@ fn file_create_robot(mut robot: &mut Vec<R>,c : Vec<&str>) -> T{
         }
     }
     return terrain;
-
 }
 
 #[cfg(test)]

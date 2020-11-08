@@ -1,11 +1,11 @@
 use std::fmt; // On importe le module `fmt`
 
+pub mod affichage;
 pub mod display;
 pub mod file;
 pub mod instructions;
 pub mod normal_game;
 pub mod random_game;
-pub mod affichage;
 pub mod rules;
 
 #[derive(Debug)]

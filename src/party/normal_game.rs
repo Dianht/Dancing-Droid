@@ -11,7 +11,7 @@ use party::display as D;
 use party::instructions as IN;
 use party::rules as RU;
 
-pub fn game(mut robot: &mut Vec<R>, mut terrain: T,mut obstacle : &mut Vec<OB>) -> bool {
+pub fn game(mut robot: &mut Vec<R>, mut terrain: T, mut obstacle: &mut Vec<OB>) -> bool {
     //Le vecteur crash va contenir touts les accidents sous forme de String
     //La variable tmp va nous permettre de garder les coordonnées avant execution de l'instruction
     //La variable obstacle va contenir un vecteur contenant les coordonnées des obstacles généré par la fonction "create_barrier"
@@ -116,8 +116,8 @@ pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) 
         let nbre_instruction = rng.gen_range(1, 10);
         for _ in 0..nbre_instruction {
             robot_instruction.push(party::random_game::random_instruction());
+        }
     }
-}
     //On push dans le vecteur robot tout les informations parsé
     //Ce qui fait que à chaque utilisation de la fonction "create_robot"
     //on a un robot creé
@@ -139,9 +139,9 @@ pub fn create_barrier(terrain: &mut T) -> Vec<OB> {
     if max == 0 {
         max = 1;
     }
-    
+
     let mut obstacle = Vec::new();
-    let mut ob : OB;
+    let mut ob: OB;
     //Il n'y aura que 3 type d'obstacle faute d'idée
     let mut i = 0;
     for _ in 0..rng.gen_range(0, max) {
@@ -150,14 +150,14 @@ pub fn create_barrier(terrain: &mut T) -> Vec<OB> {
             y: rng.gen_range(0, terrain.y),
             id: i,
         };
-        obstacle.push(ob); 
+        obstacle.push(ob);
 
         i += 1;
         if i > 2 {
             i = 0;
         }
     }
-    
+
     return obstacle;
 }
 
@@ -167,13 +167,13 @@ mod tests {
     use super::*;
     use crate::party;
     use party::Instruction as I;
-    use party::Orientation as O;
     use party::Obstacle as OB;
+    use party::Orientation as O;
     use party::Robot as R;
     use party::Terrain as T;
     #[test]
     fn test_game() {
-        let mut obstacle = vec![OB {x : 1, y : 1, id : 2}];
+        let mut obstacle = vec![OB { x: 1, y: 1, id: 2 }];
         let mut rb = vec![R {
             id: 1,
             x: 1,
@@ -182,7 +182,7 @@ mod tests {
             instruction: vec![&I::F, &I::L],
         }];
         let terrain = T { x: 5, y: 5 };
-        assert_eq!(game(&mut rb, terrain,&mut obstacle), true);
+        assert_eq!(game(&mut rb, terrain, &mut obstacle), true);
     }
     #[test]
     fn test_create_robot() {
