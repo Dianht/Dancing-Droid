@@ -1,18 +1,17 @@
-
 Le programme DancingDroid fonctionne de deux manière ; soit avec des robots inscrit dans le fichier txt "two_robot.txt" soit en génerant aléatoirement des robots.
 Le fichier txt doit respecter ce format :
-===============
+
 X X //Cordonnée du terrain
 
 X X X   //pos_x pos_y orientation
 XXXXXX  //Instruction du robot
         //Ne pas oublier le saut de ligne !!
-==================
+
 
 Dans les frustration du projet :
-Malgré un projet très amusant, on a rencontré des difficulté dans l'affichage, on a pu faire ce qu'on voulait, integré des émoji, ajouter des couleurs uniques à chaque robot mais hélàs on a découvert Hashset HashMap trop tard.
+Malgré un projet très amusant, on a rencontré des difficulté dans l'affichage, on a pu faire ce qu'on voulait, integré des émoji, ajouter des couleurs uniques à chaque robot mais hélàs.
 On était frustré de ne pas avoir réalisé tout ce vous nous avez conseillé, mais le temps et des autres facteurs nous ont empeché de les réaliser
-
+Notre plus grande frustration c'est de ne pas avoir utilisé Hashmap/Hashset 😔
 
 Le projet était cool à réaliser mais aussi casse-tête, les nombreux parametres à prendre compte pour que tout ne bug pas, l'affichage à réalisé était beaucoup trop compliqué mais bon ça marche ! Le projet était une assez bonne expérience pour nous, on a pu découvrir et coder sur un autre langage que le langage C.
 
@@ -28,11 +27,6 @@ Ibrahim : file, l'affichage du robot,display
 
 Voilà c'est tout
 
-─▄▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▄
-█░░░█░░░░░░░░░░▄▄░██░█
-█░▀▀█▀▀░▄▀░▄▀░░▀▀░▄▄░█
-█░░░▀░░░▄▄▄▄▄░░██░▀▀░█
-─▀▄▄▄▄▄▀─────▀▄▄▄▄▄▄▀
 ♪┏(・o･)┛♪┗ ( ･o･) ┓♪ └[∵┌]└[ ∵ ]┘[┐∵]┘(~‾⌣‾)~
 
         
