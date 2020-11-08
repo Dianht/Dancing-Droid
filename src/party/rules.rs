@@ -65,11 +65,10 @@ pub fn obstacle(
     crash: &mut Vec<C>,
     terrain: &mut T,
 ) {
-    //La fonction obstacle va push dans le vecteur crash tout les robots qui ont rencontré un obstacle
+    //La fonction obstacle va push dans le vecteur "crash" tout les robots qui ont rencontré un obstacle
     let mut rng = rand::thread_rng();
     //On va comparer les coordonnée du robot avec tout les coordonnée des obstacles
     //(C'est pas le meilleur des moyens mais bon...)
-    if obstacle.len() != 0 {
         for o in 0..obstacle.len() {
             //En fonction de l'id du robot, on crée des obstacles
             //si l'id est 1 par exemple l'obstacle est que le robot vomi
@@ -95,7 +94,7 @@ pub fn obstacle(
                         robot[m].x = -2;
                         robot[m].y = -2;
                         //On a plus besoin de voir les autres obstacles
-                        return;
+                        break;
                     } 
                 }
                 1 => {
@@ -118,7 +117,7 @@ pub fn obstacle(
                         obstacle.remove(o);
                         crash.push(C::Collision(s));
                         //On a plus besoin de voir les autres obstacles
-                        return;
+                        break;
                     }
                 }
                 2 => {
@@ -140,11 +139,11 @@ pub fn obstacle(
                         obstacle.remove(o);
                         //On a plus besoin de voir les autres obstacles
                         crash.push(C::Collision(s));
-                        return;
+                        break;
                     }
                 }
                 _ => (),
             }
         }
     }
-}
+

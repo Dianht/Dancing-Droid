@@ -11,13 +11,12 @@ use party::display as D;
 use party::instructions as IN;
 use party::rules as RU;
 
-pub fn game(mut robot: &mut Vec<R>, mut terrain: T) -> bool {
+pub fn game(mut robot: &mut Vec<R>, mut terrain: T,mut obstacle : &mut Vec<OB>) -> bool {
     //Le vecteur crash va contenir touts les accidents sous forme de String
     //La variable tmp va nous permettre de garder les coordonnées avant execution de l'instruction
     //La variable obstacle va contenir un vecteur contenant les coordonnées des obstacles généré par la fonction "create_barrier"
     let mut crash = Vec::new();
     let mut tmp: (i32, i32);
-    let mut obstacle = create_barrier(&mut terrain);
     let mut size = taille(robot);
     let mut x = 0;
     //On crée une boucle qui s'arrete jusqu'à que la plus grande liste d'instructions n'ai plus d'instructions
@@ -116,15 +115,9 @@ pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) 
         let mut rng = rand::thread_rng();
         let nbre_instruction = rng.gen_range(1, 10);
         for _ in 0..nbre_instruction {
-            let aleatoire = rng.gen_range(0, 3);
-            match aleatoire {
-                0 => robot_instruction.push(&I::F),
-                1 => robot_instruction.push(&I::R),
-                2 => robot_instruction.push(&I::L),
-                _ => (),
-            }
-        }
+            robot_instruction.push(party::random_game::random_instruction());
     }
+}
     //On push dans le vecteur robot tout les informations parsé
     //Ce qui fait que à chaque utilisation de la fonction "create_robot"
     //on a un robot creé
@@ -138,29 +131,33 @@ pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) 
     return true;
 }
 
-fn create_barrier(terrain: &mut T) -> Vec<OB> {
+pub fn create_barrier(terrain: &mut T) -> Vec<OB> {
     //Cette fonction va crée des obstacles aléatoirement sur la map
     let mut rng = rand::thread_rng();
     //Le nombre d'obstacle sera proportionel à la taille max de case du terrain
-    let mut max = (terrain.x * terrain.y) / 3;
+    let mut max = (terrain.x * terrain.y) / 4;
     if max == 0 {
         max = 1;
     }
+    
     let mut obstacle = Vec::new();
+    let mut ob : OB;
     //Il n'y aura que 3 type d'obstacle faute d'idée
     let mut i = 0;
     for _ in 0..rng.gen_range(0, max) {
-        obstacle.push(OB {
+        ob = OB {
             x: rng.gen_range(0, terrain.x),
             y: rng.gen_range(0, terrain.y),
             id: i,
-        });
+        };
+        obstacle.push(ob); 
 
         i += 1;
         if i > 2 {
             i = 0;
         }
     }
+    
     return obstacle;
 }
 
@@ -171,10 +168,12 @@ mod tests {
     use crate::party;
     use party::Instruction as I;
     use party::Orientation as O;
+    use party::Obstacle as OB;
     use party::Robot as R;
     use party::Terrain as T;
     #[test]
     fn test_game() {
+        let mut obstacle = vec![OB {x : 1, y : 1, id : 2}];
         let mut rb = vec![R {
             id: 1,
             x: 1,
@@ -183,7 +182,7 @@ mod tests {
             instruction: vec![&I::F, &I::L],
         }];
         let terrain = T { x: 5, y: 5 };
-        assert_eq!(game(&mut rb, terrain), true);
+        assert_eq!(game(&mut rb, terrain,&mut obstacle), true);
     }
     #[test]
     fn test_create_robot() {
