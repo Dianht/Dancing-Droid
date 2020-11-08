@@ -1,7 +1,17 @@
 use crate::party;
 use rand::Rng;
 
-pub fn game(mut robot: &mut Vec<party::Robot>, mut terrain: party::Terrain) {
+use party::Instruction as I;
+use party::Obstacle as OB;
+use party::Orientation as O;
+use party::Robot as R;
+use party::Terrain as T;
+
+use party::display as D;
+use party::instructions as IN;
+use party::rules as RU;
+
+pub fn game(mut robot: &mut Vec<R>, mut terrain: T) {
     //Le vecteur crash va contenir touts les accidents sous forme de String
     //La variable tmp va nous permettre de garder les coordonnées avant execution de l'instruction
     //La variable obstacle va contenir un vecteur contenant les coordonnées des obstacles généré par la fonction "create_barrier"
@@ -17,16 +27,16 @@ pub fn game(mut robot: &mut Vec<party::Robot>, mut terrain: party::Terrain) {
         for i in 0..robot.len() {
             if x < robot[i].instruction.len() {
                 tmp = (robot[i].x, robot[i].y);
-                party::instructions::instruction(robot[i].instruction[x], &mut robot[i]);
+                IN::instruction(robot[i].instruction[x], &mut robot[i]);
                 //Si il y a qu'un seul robot présent dans le vecteur
                 //On aura pas besoin de l'envoyer à la fonction crash
                 if robot.len() > 1 {
-                    party::rules::crash(tmp, &mut robot, i, &mut crash);
+                    RU::crash(tmp, &mut robot, i, &mut crash);
                 }
                 //Les fonctions limit et obstacles vont contenir tout les
                 //accidents durant la soirée
-                party::rules::limit(tmp, &mut robot, i, &mut crash, &mut terrain);
-                party::rules::obstacle(&mut obstacle, &mut robot, i, &mut crash, &mut terrain);
+                RU::limit(tmp, &mut robot, i, &mut crash, &mut terrain);
+                RU::obstacle(&mut obstacle, &mut robot, i, &mut crash, &mut terrain);
             }
         }
 
@@ -43,10 +53,10 @@ pub fn game(mut robot: &mut Vec<party::Robot>, mut terrain: party::Terrain) {
         }
     }
     //Nous affiche ou pas les accidents survenu durant la nuit
-    party::display::display_crash(crash);
+    D::display_crash(crash);
 }
 
-pub fn taille(robot: &mut Vec<party::Robot>) -> usize {
+pub fn taille(robot: &mut Vec<R>) -> usize {
     //Simple programme qui nous renvoie la taille de la plus grande liste
     //d'instruction d'un robot
     let mut taille = robot[0].instruction.len();
@@ -60,12 +70,12 @@ pub fn taille(robot: &mut Vec<party::Robot>) -> usize {
     return taille;
 }
 
-pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, vide: char) {
+pub fn create_robot(robot: &mut Vec<R>, c: &mut Vec<&str>, id: i32, vide: char) {
     //Le programme va parser tout les chaines de caracteres qu'il a reçu dans la variable c
     //On commence par initialiser toutes les variables que va recevoir un robot
-    let mut robot_instruction: Vec<&party::Instruction> = Vec::new();
+    let mut robot_instruction: Vec<&I> = Vec::new();
     let mut position: Vec<i32> = Vec::new();
-    let mut orientation = party::Orientation::North;
+    let mut orientation = O::North;
 
     //On sait que les 2 premiers strings envoyé par file sont les positions initiaux du robot
     for i in 0..2 {
@@ -77,10 +87,10 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
     //Le 3e string sera bien evidemment l'orientation du robot
     //En fonction du string, le programme va envoyé au robot l'équivalent du string en variable
     match c[2] {
-        "N" => orientation = party::Orientation::North,
-        "E" => orientation = party::Orientation::Est,
-        "W" => orientation = party::Orientation::West,
-        "S" => orientation = party::Orientation::South,
+        "N" => orientation = O::North,
+        "E" => orientation = O::Est,
+        "W" => orientation = O::West,
+        "S" => orientation = O::South,
         _ => println!("C'est une Orientation ???? {}", c[2]),
     }
     //Dans cette partie du programme, on compare si le char reçu par la fonction "file"
@@ -92,9 +102,9 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
         let instruction: Vec<char> = c[3].chars().collect();
         for i in 0..instruction.len() {
             match instruction[i] {
-                'F' => robot_instruction.push(&party::Instruction::F),
-                'R' => robot_instruction.push(&party::Instruction::R),
-                'L' => robot_instruction.push(&party::Instruction::L),
+                'F' => robot_instruction.push(&I::F),
+                'R' => robot_instruction.push(&I::R),
+                'L' => robot_instruction.push(&I::L),
                 _ => {
                     println!("C'est une instruction ???? {} ", instruction[i]);
                     break;
@@ -107,9 +117,9 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
         for _ in 0..nbre_instruction {
             let aleatoire = rng.gen_range(0, 3);
             match aleatoire {
-                0 => robot_instruction.push(&party::Instruction::F),
-                1 => robot_instruction.push(&party::Instruction::R),
-                2 => robot_instruction.push(&party::Instruction::L),
+                0 => robot_instruction.push(&I::F),
+                1 => robot_instruction.push(&I::R),
+                2 => robot_instruction.push(&I::L),
                 _ => (),
             }
         }
@@ -117,7 +127,7 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
     //On push dans le vecteur robot tout les informations parsé
     //Ce qui fait que à chaque utilisation de la fonction "create_robot"
     //on a un robot creé
-    robot.push(party::Robot {
+    robot.push(R {
         id: id,
         x: position[1],
         y: position[0],
@@ -126,7 +136,7 @@ pub fn create_robot(robot: &mut Vec<party::Robot>, c: &mut Vec<&str>, id: i32, v
     });
 }
 
-fn create_barrier(terrain: &mut party::Terrain) -> Vec<party::Obstacle> {
+fn create_barrier(terrain: &mut T) -> Vec<OB> {
     //Cette fonction va crée des obstacles aléatoirement sur la map
     let mut rng = rand::thread_rng();
     //Le nombre d'obstacle sera proportionel à la taille max de case du terrain
@@ -138,7 +148,7 @@ fn create_barrier(terrain: &mut party::Terrain) -> Vec<party::Obstacle> {
     //Il n'y aura que 3 type d'obstacle faute d'idée
     let mut i = 0;
     for _ in 0..rng.gen_range(0, max) {
-        obstacle.push(party::Obstacle {
+        obstacle.push(OB {
             x: rng.gen_range(0, terrain.x),
             y: rng.gen_range(0, terrain.y),
             id: i,

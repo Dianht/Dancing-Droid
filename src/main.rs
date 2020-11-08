@@ -1,5 +1,7 @@
 use colored::*;
 pub mod party;
+use party::display as D;
+use party::normal_game as N_G;
 
 fn main() {
     //Vecteur qui va accueillir le(s) robot(s)
@@ -15,20 +17,20 @@ fn main() {
         "Y".green(),
         "N".red()
     );
-    //En fonction de la réponse de l'utilisateur la taille du terrain 
-    //est soit donné par la fonction "random_world" soit donné par la fonction "file" 
-    let mut terrain = party::display::choice(&mut robot);
+    //En fonction de la réponse de l'utilisateur la taille du terrain
+    //est soit donné par la fonction "random_world" soit donné par la fonction "file"
+    let mut terrain = D::choice(&mut robot);
 
     //Si le robot est vide, on ne lance pas le programme
     if robot.is_empty() {
         println!("Votre monde n'a pas de robot 🤡");
     } else {
-        party::display::display(&mut robot, &mut terrain);
+        D::display(&mut robot, &mut terrain);
         println!("========================\nEtat initial\n========================");
-        party::display::initial_final(&mut robot, "initial".cyan().bold().to_string());
+        D::initial_final(&mut robot, "initial".cyan().bold().to_string());
         println!("========================\n🎶 └[∵┌]└[ ∵ ]┘[┐∵]┘ 🎶\n========================");
-        party::normal_game::game(&mut robot, terrain);
+        N_G::game(&mut robot, terrain);
         println!("========================\nEtat final\n========================");
-        party::display::initial_final(&mut robot, "finale".blue().bold().to_string());
+        D::initial_final(&mut robot, "finale".blue().bold().to_string());
     }
 }

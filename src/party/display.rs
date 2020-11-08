@@ -1,9 +1,14 @@
 use crate::party;
 use colored::*;
+use party::file as F;
+use party::random_game as R_G;
+use party::Crash as C;
+use party::Robot as R;
+use party::Terrain as T;
 use std::io;
 use std::{thread, time};
 
-pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
+pub fn choice(mut robot: &mut Vec<R>) -> T {
     //La fonction permettra à l'utilisateur de choisir entre sélectionner le monde aléatoire
     //ou le monde généré par le fichier "two_robots.txt"
     //La variable ten_millis va permettre de définir le temps en ms qu'on voudrais que le programme
@@ -26,8 +31,8 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                     );
                     //On met en pause le programme 2000ms (valeur entré dans la variable "ten_millis")
                     thread::sleep(ten_millis);
-                    //On return en executant la fonction "random_world" 
-                    return party::random_game::random_world(&mut robot);
+                    //On return en executant la fonction "random_world"
+                    return R_G::random_world(&mut robot);
                 }
                 "N" | "n" => {
                     println!(
@@ -41,7 +46,7 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                     //On met en pause le programme 2000ms (valeur entré dans la variable "ten_millis")
                     thread::sleep(ten_millis);
                     //On return en executant la fonction "file"
-                    return party::file::file(&mut robot);
+                    return F::file(&mut robot);
                 }
                 _ => println!("Y/N ?"),
             },
@@ -50,7 +55,7 @@ pub fn choice(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
     }
 }
 
-pub fn initial_final(robot: &mut Vec<party::Robot>, position: String) {
+pub fn initial_final(robot: &mut Vec<R>, position: String) {
     //Cette fonction va afficher tout les robots contenu dans le vecteur un par un
     for i in 0..robot.len() {
         let id = robot[i].id;
@@ -74,22 +79,31 @@ pub fn initial_final(robot: &mut Vec<party::Robot>, position: String) {
     }
 }
 
-pub fn display(robot: &mut Vec<party::Robot>, terrain: &mut party::Terrain) {
+pub fn display(robot: &mut Vec<R>, terrain: &mut T) {
     //Cette fonction va afficher le contenu des variables grâce à l'implémentation
     //du trait Display
-    println!("Terrain {{ {} }}", terrain);
-    println!("Robots {{");
-    for i in 0..robot.len() {
-        println!("  {{ {}, }}", robot[i]);
+    println!("Musique : 'HATARI - ENGIN MISKUNN' 🎶");
+    println!("Piste de danse {{ {} }}", terrain);
+    println!("Robots [");
+    let len = robot.len();
+    //Iterator is beautiful
+    for bot in robot {
+        println!("  {{ {}, }}", bot);
     }
-    println!("}}");
+    println!("]");
+    if len == 1 {
+        println!("Wouhou...")
+    }
 }
 
-pub fn display_crash(crash: Vec<party::Crash>) {
+pub fn display_crash(crash: Vec<C>) {
     //Cette fonction va afficher le nombres de crash eu durant la soirée
     //ou pas
     if crash.is_empty() {
-        println!("La soirée s'est bien passé, aucun incident à déplorer");
+        println!(
+            "La soirée s'est bien passé, aucun incident à déplorer\n{}",
+            "signé : La Direction 🕶".italic()
+        );
     } else {
         for aie in crash.iter() {
             println!("{}", aie);

@@ -1,13 +1,16 @@
 use crate::party;
 use colored::*;
+use party::normal_game as N_G;
+use party::Robot as R;
+use party::Terrain as T;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
+pub fn file(mut robot: &mut Vec<R>) -> T {
     //On crée deux variable, un qui va contenenir le chemin où se trouve le fichier des robots
     //Et l'autre pour afficher le chemin en cas de panic!
-    let path = Path::new("../two_robots.txt");
+    let path = Path::new("../DancingDroids/two_robots.txt");
     let display = path.display();
 
     let mut file = match File::open(&path) {
@@ -31,7 +34,7 @@ pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
     let mut m: Vec<&str> = Vec::new();
     let mut id: i32 = 0;
 
-    let mut terrain = party::Terrain {x : 0, y : 0};
+    let mut terrain = T { x: 0, y: 0 };
     //Bien evidemment le fichier two_robots.txt commence par les coordonnées du terrain
     //Du coup, les deux premieres cases du vecteur seront les coordonnées du terrain
     //Étant donné que le vecteur c ne contient que des String, on devra parser le string en i32
@@ -56,7 +59,7 @@ pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                 //create_robot qui va se charger de parser tout les chaines de caractere
                 //on oublie pas de lui donnée un id
                 //'N' va juste dire que le robot à bien tout sa liste d'instruction
-                party::normal_game::create_robot(&mut robot, &mut m, id, 'N');
+                N_G::create_robot(&mut robot, &mut m, id, 'N');
                 id += 1;
                 //Bien sur on réintilise le vecteur pour que le vecteur m puisse acceuillir d'autre robots
                 m.clear();
@@ -67,7 +70,7 @@ pub fn file(mut robot: &mut Vec<party::Robot>) -> party::Terrain {
                 let s = id.to_string();
                 println!("🚨 Le robot<{}> ne contient pas d'instruction, les instructions seront générés aléatoirement 🎲 ...",s.red());
                 //On envoie le char "O"(oui) qui va dire au programme que le robot n'a pas d'instruction
-                party::normal_game::create_robot(&mut robot, &mut m, id, 'O');
+                N_G::create_robot(&mut robot, &mut m, id, 'O');
                 id += 1;
                 m.clear();
             } else {

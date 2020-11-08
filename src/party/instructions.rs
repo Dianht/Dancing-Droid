@@ -1,4 +1,6 @@
 use crate::party;
+use party::Instruction as I;
+use party::Orientation as O;
 
 pub fn instruction(instruction_robot: &party::Instruction, robot: &mut party::Robot) {
     //Cette fonction va permettre de realisé les mouvements du robot
@@ -6,25 +8,25 @@ pub fn instruction(instruction_robot: &party::Instruction, robot: &mut party::Ro
     match instruction_robot {
         //En fonction de l'orientation du robot, le moment où l'instruction est F
         //le programme va modifier les coordonnée du robot
-        party::Instruction::F => match robot.orientation {
-            party::Orientation::North => robot.y = robot.y + 1,
-            party::Orientation::West => robot.x = robot.x - 1,
-            party::Orientation::Est => robot.x = robot.x + 1,
-            party::Orientation::South => robot.y = robot.y - 1,
+        I::F => match robot.orientation {
+            O::North => robot.y = robot.y + 1,
+            O::West => robot.x = robot.x - 1,
+            O::Est => robot.x = robot.x + 1,
+            O::South => robot.y = robot.y - 1,
         },
         //En fonction de l'orientation du robot, le moment où l'instruction est L ou R
         //le programme va modifier l'orientation du robot
-        party::Instruction::L => match robot.orientation {
-            party::Orientation::North => robot.orientation = party::Orientation::West,
-            party::Orientation::West => robot.orientation = party::Orientation::South,
-            party::Orientation::Est => robot.orientation = party::Orientation::North,
-            party::Orientation::South => robot.orientation = party::Orientation::Est,
+        I::L => match robot.orientation {
+            O::North => robot.orientation = O::West,
+            O::West => robot.orientation = O::South,
+            O::Est => robot.orientation = O::North,
+            O::South => robot.orientation = O::Est,
         },
-        party::Instruction::R => match robot.orientation {
-            party::Orientation::North => robot.orientation = party::Orientation::Est,
-            party::Orientation::West => robot.orientation = party::Orientation::North,
-            party::Orientation::Est => robot.orientation = party::Orientation::South,
-            party::Orientation::South => robot.orientation = party::Orientation::West,
+        I::R => match robot.orientation {
+            O::North => robot.orientation = O::Est,
+            O::West => robot.orientation = O::North,
+            O::Est => robot.orientation = O::South,
+            O::South => robot.orientation = O::West,
         },
     }
 }
